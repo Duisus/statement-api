@@ -23,8 +23,7 @@ namespace Migrations
             {
                 Create.Table(TableName)
                     .WithColumn(nameof(FileModel.Id)).AsInt64().PrimaryKey().Identity()
-                    .WithColumn(nameof(FileModel.FileName)).AsString()
-                    .WithColumn(nameof(FileModel.Base64)).AsString(int.MaxValue);
+                    .WithColumn(nameof(FileModel.FileName)).AsString();
             }
         }
     }

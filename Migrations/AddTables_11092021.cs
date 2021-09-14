@@ -28,7 +28,10 @@ namespace Migrations
                 Create.Table("Student")
                     .WithColumn("Id").AsInt64().PrimaryKey().Identity()
                     .WithColumn("FullName").AsString().Unique()
-                    .WithColumn("Group").AsString();
+                    .WithColumn("Group").AsString()
+                    .WithColumn("EntrolledCourses").AsInt64()
+                    .WithColumn("CompletedCourses").AsInt64()
+                    .WithColumn("MemberState").AsString();
             }
         }
 

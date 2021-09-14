@@ -6,6 +6,7 @@ using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Microsoft.VisualBasic.FileIO;
 using Serilog;
+using Server.Logic;
 using Server.Managers.Interfaces;
 using Server.Models;
 using Server.Repository.Interfaces;
@@ -27,12 +28,10 @@ namespace Server.Managers
             _assignmentRepository = assignmentRepository;
         }
 
-        public Task<List<string[]>> ParseCsvFileAsync(string delimeter, string base64String)
+        public Task<List<string[]>> ParseCsvFileAsync(string delimeter, string file)
         {
             var result = new List<string[]>();
-            var bytes = Convert.FromBase64String(base64String);
-            var csv = Encoding.UTF8.GetString(bytes);
-            foreach (string row in csv.Split('\n').Skip(1))
+            foreach (string row in file.Split('\n').Skip(1))
             {
                 string[] values = row.Split($"\"{delimeter}\"");
                 result.Add(values);
@@ -41,14 +40,22 @@ namespace Server.Managers
             return Task.FromResult(result);
         }
 
-        public async Task<List<Student>> ParseMembershipCsvToStudents(string base64String)
+        public async Task<OperationResult<List<Student>>> ParseStudentsCsvToStudents(string file)
         {
+            var existingStudents = await _studentRepository.GetAllAsync();
             var students = new Dictionary<string, Student>();
-            var rows = await ParseCsvFileAsync(",", base64String);
+            var rows = await ParseCsvFileAsync(",", file);
             foreach (var row in rows)
             {
                 var name = row[0].Trim('\"');
+                if (existingStudents.Any(student => student.FullName == name))
+                {
+                    continue;
+                }
                 var group = row[2].Trim('\"');
+                var enrolledCourses = int.Parse(row[5].Trim('\"'));
+                var completedCourses = int.Parse(row[6].Trim('\"'));
+                var memberState = row[7].Trim('\"');
                 if (name == "ANONYMIZED_NAME" || string.IsNullOrEmpty(name))
                 {
                     continue;
@@ -56,7 +63,10 @@ namespace Server.Managers
                 var student = new Student
                 {
                     FullName = name,
-                    Group = group
+                    Group = group,
+                    EnrolledCourses = enrolledCourses,
+                    CompletedCourses = completedCourses,
+                    MemberState = memberState
                 };
 
                 if (!students.ContainsKey(name))
@@ -68,15 +78,15 @@ namespace Server.Managers
                     students[row[0]] = student;
                 }
             }
-
-            return students.Values.GroupBy(stud => stud.FullName).Select(stud => stud.First()).ToList();
+            var result = students.Values.GroupBy(stud => stud.FullName).Select(stud => stud.First()).ToList();
+            return OperationResult<List<Student>>.Success(result);
         }
 
-        public async Task<List<Specialization>> ParseSpecializationCsvToSpecializations(string base64String)
+        public async Task<OperationResult<List<Specialization>>> ParseSpecializationCsvToSpecializations(string file)
         {
             var result = new Dictionary<string, List<Specialization>>();
             var students = await _studentRepository.GetAllAsync();
-            var rows = await ParseCsvFileAsync(",", base64String);
+            var rows = await ParseCsvFileAsync(",", file);
             foreach (var row in rows)
             {
                 var name = row[0].Trim('\"');
@@ -107,16 +117,16 @@ namespace Server.Managers
                     });
                 }
             }
-
-            return result.Values.SelectMany(specs => specs).ToList();
+            var res = result.Values.SelectMany(specs => specs).ToList();
+            return OperationResult<List<Specialization>>.Success(res);
         }
 
-        public async Task<List<Course>> ParseCourseCsvToSpecializations(string base64String)
+        public async Task<OperationResult<List<Course>>> ParseCourseCsvToSpecializations(string file)
         {
             var result = new Dictionary<string, List<Course>>();
             var students = await _studentRepository.GetAllAsync();
             var specializations = await _specializationRepository.GetAllAsync();
-            var rows = await ParseCsvFileAsync(",", base64String);
+            var rows = await ParseCsvFileAsync(",", file);
             foreach (var row in rows)
             {
                 var name = row[0].Trim('\"');
@@ -158,13 +168,14 @@ namespace Server.Managers
                     }
                 }
             }
-
-            return result.SelectMany(courses => courses.Value).ToList();
+            
+            var res = result.SelectMany(courses => courses.Value).ToList();
+            return OperationResult<List<Course>>.Success(res);
         }
 
-        public async Task<List<Assignment>> ParseAssignmentCsvToAssignments(string base64String)
+        public async Task<OperationResult<List<Assignment>>> ParseAssignmentCsvToAssignments(string file)
         {
-            var rows = await ParseCsvFileAsync(",",base64String);
+            var rows = await ParseCsvFileAsync(",",file);
             var students = await _studentRepository.GetAllAsync();
             var courses = await _courseRepository.GetAllAsync();
             var assignments = await _assignmentRepository.GetAllAsync();
@@ -194,8 +205,9 @@ namespace Server.Managers
                     result[studentName] = new List<Assignment>() {assignment};
                 }
             }
+            var res = result.Values.SelectMany(value => value).ToList();
 
-            return result.Values.SelectMany(value => value).ToList();
+            return OperationResult<List<Assignment>>.Success(res);
         }
 
         private Specialization CreateSpecializationWithoutStudentId(string[] row)

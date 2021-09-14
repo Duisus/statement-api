@@ -1,19 +1,18 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
+using Server.Logic;
 using Server.Models;
 
 namespace Server.Managers.Interfaces
 {
     public interface ICsvParserManager
     {
-        public Task<List<string[]>> ParseCsvFileAsync(string delimeter, string base64String);
+        public Task<OperationResult<List<Student>>> ParseStudentsCsvToStudents(string file);
 
-        public Task<List<Student>> ParseMembershipCsvToStudents(string base64String);
-
-        public Task<List<Specialization>> ParseSpecializationCsvToSpecializations(string base64String);
+        public Task<OperationResult<List<Specialization>>> ParseSpecializationCsvToSpecializations(string file);
         
-        public Task<List<Course>> ParseCourseCsvToSpecializations(string base64String);
+        public Task<OperationResult<List<Course>>> ParseCourseCsvToSpecializations(string file);
 
-        public Task<List<Assignment>> ParseAssignmentCsvToAssignments(string base64String);
+        public Task<OperationResult<List<Assignment>>> ParseAssignmentCsvToAssignments(string file);
     }
 }

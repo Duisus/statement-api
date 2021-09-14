@@ -31,5 +31,9 @@ namespace Server.Settings
         public string AssignmentFileName => _configuration
             .GetSection(FileSection)
         .GetValue<string>("Assignments") + _fileExtension;
+
+        public string Path => _configuration
+            .GetSection(FileSection)
+            .GetValue<string>("Path");
     }
 }

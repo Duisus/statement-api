@@ -6,6 +6,7 @@ using Dapper;
 using Dapper.Contrib.Extensions;
 using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Configuration;
+using Server.Logic;
 using Server.Repository.Interfaces;
 
 namespace Server.Repository 
@@ -25,7 +26,7 @@ namespace Server.Repository
             return addResult;
         }
 
-        public async Task<long> AddMultipleAsync(IEnumerable<T> items)
+        public async Task<OperationResult<long>> AddMultipleAsync(IEnumerable<T> items)
         {
             await using var connection = new SqlConnection(_dbConnection);
             var propNames = typeof(T)
@@ -36,10 +37,18 @@ namespace Server.Repository
             var sql = $"INSERT INTO [{typeof(T).Name}] VALUES ({string.Join(',',propNames)}) ";
             foreach (var item in items)
             {
-                await connection.ExecuteAsync(sql, item);
+                try
+                {
+                    await connection.ExecuteAsync(sql, item);
+                }
+                catch (Exception e)
+                {
+                    return OperationResult<long>.Error(e.Message);
+                }
+                
             }
 
-            return 1;
+            return OperationResult<long>.Success();
         }
 
         public async Task<List<T>> GetByStudentIdColumnAsync(int studentId)
@@ -48,6 +57,13 @@ namespace Server.Repository
             var sql = $"SELECT * FROM {typeof(T).Name} WHERE StudentId = {studentId}";
             var result = await connection.QueryAsync<T>(sql);
             return result.ToList();
+        }
+
+        public async Task<bool> UpdateAsync(T item)
+        {
+            await using var connection = new SqlConnection(_dbConnection);
+            var result = await connection.UpdateAsync(item);
+            return result;
         }
 
         public async Task<List<T>> GetAllAsync()

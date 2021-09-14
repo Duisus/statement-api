@@ -1,11 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
+using System.IO.Compression;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Server.Models;
 using Server.Repository.Interfaces;
+using Server.Settings;
 
 namespace Server.Controllers
 {
@@ -14,9 +17,11 @@ namespace Server.Controllers
     public class FileController : Controller
     {
         private readonly IFileRepository _fileRepository;
-        public FileController(IFileRepository fileRepository)
+        private readonly IAppSettings _appSettings;
+        public FileController(IFileRepository fileRepository, IAppSettings appSettings)
         {
             _fileRepository = fileRepository;
+            _appSettings = appSettings;
         }
         
         [ProducesResponseType(typeof(int),200)]
@@ -25,25 +30,25 @@ namespace Server.Controllers
         {
             if (uploadedFile == null)
             {
-                return BadRequest();
+                return BadRequest("empty file");
             }
-
             var existingFile = await _fileRepository.GetByFileNameAsync(uploadedFile.FileName);
             if (existingFile != null)
             {
-                return BadRequest($"File with name {existingFile.FileName} already exists");
+                Serilog.Log.Warning($"File with name {existingFile.FileName} already exists, rewriting...");
             }
-            await using var fileStream = uploadedFile.OpenReadStream();
-            byte[] bytes = new byte[uploadedFile.Length];
-            await fileStream.ReadAsync(bytes, 0, (int)uploadedFile.Length);
+
+            var fileStream = new FileStream(_appSettings.Path + $"\\{uploadedFile.FileName}", FileMode.Create, FileAccess.Write);
+            await uploadedFile.CopyToAsync(fileStream);
+            await fileStream.DisposeAsync();
+            
             var newFile = new FileModel()
             {
-                Base64 = Convert.ToBase64String(bytes),
                 FileName = uploadedFile.FileName,
             };
 
             var id = await _fileRepository.AddAsync(newFile);
-            if (id <= 0)
+            if (id == 0)
             {
                 return BadRequest("Произошла ошибка при загрузке файла");
             }

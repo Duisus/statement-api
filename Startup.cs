@@ -49,9 +49,10 @@ namespace Server
                 .AddTransient<IAssignmentRepository, AssignmentRepository>()
                 .AddTransient<IFileRepository, FileRepository>();
 
-            //Csv parser
+            //Managers
             services
-                .AddTransient<ICsvParserManager, CsvParserManager>();
+                .AddTransient<ICsvParserManager, CsvParserManager>()
+                .AddTransient<IUploadManager, UploadManager>();
             
             //Настройки
             services

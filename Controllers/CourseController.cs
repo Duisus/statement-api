@@ -17,43 +17,38 @@ namespace Server.Controllers
         private readonly IFileRepository _fileRepository;
         private readonly IAppSettings _appSettings;
         private readonly ICourseRepository _courseRepository;
+        private readonly IUploadManager _uploadManager;
 
         public CourseController(
             ISpecializationRepository specializationRepository,
             ICsvParserManager csvParserManager,
             IFileRepository fileRepository, 
             IAppSettings appSettings,
-            ICourseRepository courseRepository)
+            ICourseRepository courseRepository,
+            IUploadManager uploadManager)
         {
             _specializationRepository = specializationRepository;
             _csvParserManager = csvParserManager;
             _fileRepository = fileRepository;
             _appSettings = appSettings;
             _courseRepository = courseRepository;
+            _uploadManager = uploadManager;
         }
 
         [HttpGet("addfromfile")]
         public async Task<ActionResult> AddFromCoursesFileAsync()
         {
-            var file = await _fileRepository.GetByFileNameAsync(_appSettings.CoursesFileName);
-            if (file == null)
+            var result = await _uploadManager.UploadFormFileAsync(
+                _appSettings.CoursesFileName,
+                _courseRepository,
+                _csvParserManager.ParseCourseCsvToSpecializations);
+
+            if (!result.IsSuccess)
             {
-                return BadRequest($"Невозможно загрузить курсы, так как файла {_appSettings.CoursesFileName} не существует");
-            }
-            
-            var result = await _csvParserManager.ParseCourseCsvToSpecializations(file.Base64);
-            if (result.Count == 0)
-            {
-                return BadRequest("Не удалось получить курсы из файла");
+                return BadRequest(result.ErrorText);
             }
 
-            var addResult = await _courseRepository.AddMultipleAsync(result);
-            if (addResult == 0)
-            {
-                return BadRequest("Не удалось добавить курсы");
-            }
-
-            return Ok();
+            return Ok("Курсы успешно добавлены в базу данных");
         }
     }
 }

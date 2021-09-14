@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Server.Logic;
 
 namespace Server.Repository.Interfaces 
 {
@@ -20,8 +21,10 @@ namespace Server.Repository.Interfaces
         /// <summary>
         /// Добавить несколько записей и получить их Id
         ///</summary>
-        public Task<long> AddMultipleAsync(IEnumerable<T> items);
+        public Task<OperationResult<long>> AddMultipleAsync(IEnumerable<T> items);
 
         public Task<List<T>> GetByStudentIdColumnAsync(int studentId);
+
+        public Task<bool> UpdateAsync(T item);
     }
 }

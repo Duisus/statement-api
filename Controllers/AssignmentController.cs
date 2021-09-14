@@ -12,45 +12,35 @@ namespace Server.Controllers
     [ApiController]
     public class AssignmentController : Controller 
     {
-        private readonly ICsvParserManager _csvParserManager;
-        private readonly IFileRepository _fileRepository;
         private readonly IAppSettings _appSettings;
+        private readonly IUploadManager _uploadManager;
         private readonly IAssignmentRepository _assignmentRepository;
+        private readonly ICsvParserManager _csvParserManager;
 
-        public AssignmentController(
-            ICsvParserManager csvParserManager, 
-            IFileRepository fileRepository,
-            IAppSettings appSettings, 
-            IAssignmentRepository assignmentRepository)
+        public AssignmentController(IAppSettings appSettings,
+            IUploadManager uploadManager,
+            IAssignmentRepository assignmentRepository,
+            ICsvParserManager csvParserManager)
         {
-            _csvParserManager = csvParserManager;
-            _fileRepository = fileRepository;
             _appSettings = appSettings;
+            _uploadManager = uploadManager;
             _assignmentRepository = assignmentRepository;
+            _csvParserManager = csvParserManager;
         }
 
-        [HttpGet("addfromfile")]
+        [HttpGet("uploadfromfile")]
         public async Task<ActionResult> AddFromAssignmentFileAsync()
         {
-            var file = await _fileRepository.GetByFileNameAsync(_appSettings.AssignmentFileName);
-            if (file == null)
+            var result = await _uploadManager.UploadFormFileAsync(
+                _appSettings.AssignmentFileName,
+                _assignmentRepository, _csvParserManager.ParseAssignmentCsvToAssignments);
+
+            if (!result.IsSuccess)
             {
-                return BadRequest($"Невозможно загрузить специализации, так как файла {_appSettings.AssignmentFileName} не существует");
+                return BadRequest(result.ErrorText);
             }
 
-            var result = await _csvParserManager.ParseAssignmentCsvToAssignments(file.Base64);
-            if (result.Count == 0)
-            {
-                return BadRequest("Не удалось получить специализации из файла");
-            }
-
-            var addResult = await _assignmentRepository.AddMultipleAsync(result);
-            if (addResult == 0)
-            {
-                return BadRequest("Не удалось добавить специализации");
-            }
-
-            return Ok();
+            return Ok("Задания успешно добавлены в базу данных");
         }
     }
 }

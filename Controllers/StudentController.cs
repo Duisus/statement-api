@@ -23,6 +23,7 @@ namespace Server.Controllers
         private readonly ICourseRepository _courseRepository;
         private readonly IAssignmentRepository _assignmentRepository;
         private readonly IMapper _mapper;
+        private readonly IUploadManager _uploadManager;
 
         public StudentController(
             IStudentRepository studentRepository,
@@ -32,7 +33,7 @@ namespace Server.Controllers
             ISpecializationRepository specializationRepository,
             ICourseRepository courseRepository,
             IAssignmentRepository assignmentRepository, 
-            IMapper mapper)
+            IMapper mapper, IUploadManager uploadManager)
         {
             _studentRepository = studentRepository;
             _csvParserManager = csvParserManager;
@@ -42,6 +43,7 @@ namespace Server.Controllers
             _courseRepository = courseRepository;
             _assignmentRepository = assignmentRepository;
             _mapper = mapper;
+            _uploadManager = uploadManager;
         }
 
         [HttpGet("{id:int}")]
@@ -56,27 +58,19 @@ namespace Server.Controllers
         }
         
         [HttpGet("addfromfile")]
-        public async Task<ActionResult> AddFromMembershipFile()
+        public async Task<ActionResult> AddFromStudentsFileAsync()
         {
-            var file = await _fileRepository.GetByFileNameAsync(_appSettings.StudentsFileName);
-            if (file == null)
+            var result = await _uploadManager.UploadFormFileAsync(
+                _appSettings.StudentsFileName,
+                _studentRepository,
+                _csvParserManager.ParseStudentsCsvToStudents);
+
+            if (!result.IsSuccess)
             {
-                return BadRequest($"Невозможно загрузить студентов, так как файла {_appSettings.StudentsFileName} не существует");
+                return BadRequest(result.ErrorText);
             }
 
-            var result = await _csvParserManager.ParseMembershipCsvToStudents(file.Base64);
-            if (result.Count == 0)
-            {
-                return BadRequest("Не удалось получить студентов");
-            }
-
-            var addResult = await _studentRepository.AddMultipleAsync(result);
-            if (addResult == 0)
-            {
-                return BadRequest("Не удалось добавить студентов");
-            }
-
-            return Ok();
+            return Ok("Студенты успешно добавлены в базу данных");
         }
         
         [HttpGet]
