@@ -1,6 +1,7 @@
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
+using Server.Dto;
 using Server.Repository.Interfaces;
 using Server.Managers.Interfaces;
 using Server.Models;
@@ -43,6 +44,18 @@ namespace Server.Controllers
             }
 
             return Ok("Специализации успешно добавлены в базу данных");
+        }
+
+        [HttpGet]
+        public async Task<ActionResult<GetAllSpecializationsRequestDto>> GetAllSpecializationsAsync()
+        {
+            var specializations = await _specializationRepository.GetAllAsync();
+            var result = specializations
+                .GroupBy(spec => spec.Title)
+                .Select(spec => spec.FirstOrDefault()?.Title)
+                .ToList();
+            
+            return Ok(new GetAllSpecializationsRequestDto() {Specializations = result});
         }
     }
 }

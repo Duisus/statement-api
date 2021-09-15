@@ -60,7 +60,7 @@ namespace Migrations
                     .WithColumn("StudentId").AsInt64().ForeignKey("Student", "Id")
                     .WithColumn("Title").AsString()
                     .WithColumn("IsCompleted").AsBoolean()
-                    .WithColumn("Progress").AsFloat()
+                    .WithColumn("Progress").AsDouble()
                     .WithColumn("Grade").AsFloat()
                     .WithColumn("SertificateUrl").AsString().Nullable()
                     .WithColumn("LearningHours").AsFloat()

@@ -80,6 +80,26 @@ namespace Server.Controllers
             return Ok(result);
         }
 
+        [HttpPost("withinfo")]
+        public async Task<ActionResult<List<GetStudentWithInfoRequestDto>>> GetStudentsWithInfoAsync([FromBody] GetStudentsWithInfoRequestDto dto)
+        {
+            var result = new List<GetStudentWithInfoRequestDto>();
+            var students = await _studentRepository.GetAllAsync();
+            foreach (var student in students)
+            {
+                var specializations = await _specializationRepository.GetByStudentIdColumnAsync(student.Id);
+                var courses = await _courseRepository.GetByStudentIdColumnAsync(student.Id);
+                var info = new GetStudentWithInfoRequestDto()
+                {
+                    Student = _mapper.Map<StudentDto>(student),
+                    Specializations = _mapper.Map<List<SpecializationDto>>(specializations),
+                    Courses = _mapper.Map<List<CourseDto>>(courses)
+                };
+                result.Add(info);
+            }
+            return Ok(result);
+        }
+
         [HttpGet("withinfo/{id:int}")]
         public async Task<ActionResult<GetStudentWithInfoRequestDto>> GetStudentByIdWithInfoDto(int id)
         {

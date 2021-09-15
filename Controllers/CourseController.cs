@@ -1,6 +1,7 @@
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
+using Server.Dto;
 using Server.Repository.Interfaces;
 using Server.Managers.Interfaces;
 using Server.Models;
@@ -49,6 +50,18 @@ namespace Server.Controllers
             }
 
             return Ok("Курсы успешно добавлены в базу данных");
+        }
+        
+        [HttpGet]
+        public async Task<ActionResult<GetAllCoursesRequestDto>> GetAllCoursesAsync()
+        {
+            var courses = await _courseRepository.GetAllAsync();
+            var result = courses
+                .GroupBy(spec => spec.Title)
+                .Select(spec => spec.FirstOrDefault()?.Title)
+                .ToList();
+            
+            return Ok(new GetAllCoursesRequestDto() {Courses = result});
         }
     }
 }

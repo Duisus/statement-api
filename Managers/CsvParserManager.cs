@@ -87,6 +87,7 @@ namespace Server.Managers
             var result = new Dictionary<string, List<Specialization>>();
             var students = await _studentRepository.GetAllAsync();
             var rows = await ParseCsvFileAsync(",", file);
+            var existingSpecializations = await _specializationRepository.GetAllAsync();
             foreach (var row in rows)
             {
                 var name = row[0].Trim('\"');
@@ -98,6 +99,11 @@ namespace Server.Managers
                 {
                     var specialization = CreateSpecializationWithoutStudentId(row);
                     specialization.StudentId = result[name][0].StudentId;
+                    if (existingSpecializations.Any(existingSpecialization =>
+                        existingSpecialization.Equals(specialization)))
+                    {
+                        continue;
+                    }
                     result[name].Add(specialization);
                 }
                 else
@@ -105,12 +111,17 @@ namespace Server.Managers
                     var student = students.FirstOrDefault(student => student.FullName == name);
                     if (student == null)
                     {
-                        Serilog.Log.Warning($"There is specialization without student with name {name}. Skipping");
+                        Serilog.Log.Warning($"There is no student {name}. Skipping");
                         continue;
                     }
 
                     var specialization = CreateSpecializationWithoutStudentId(row);
                     specialization.StudentId = student.Id;
+                    if (existingSpecializations.Any(existingSpecialization =>
+                        existingSpecialization.Equals(specialization)))
+                    {
+                        continue;
+                    }
                     result.Add(name, new List<Specialization>()
                     {
                         specialization
@@ -123,6 +134,7 @@ namespace Server.Managers
 
         public async Task<OperationResult<List<Course>>> ParseCourseCsvToSpecializations(string file)
         {
+            var existingCourses = await _courseRepository.GetAllAsync();
             var result = new Dictionary<string, List<Course>>();
             var students = await _studentRepository.GetAllAsync();
             var specializations = await _specializationRepository.GetAllAsync();
@@ -131,6 +143,10 @@ namespace Server.Managers
             {
                 var name = row[0].Trim('\"');
                 var course = CreateCourseWithoutStudentIdSpecId(row);
+                if (existingCourses.Any(existingCourse => existingCourse.Equals(course)))
+                {
+                    continue;
+                }
                 if (result.ContainsKey(name))
                 {
                     course.StudentId = result[name][0].StudentId;
@@ -230,7 +246,7 @@ namespace Server.Managers
             var startTimeParsed = DateTime.TryParse(trimmedRow[9], out DateTime startTime);
             var lastActivityTimeParsed = DateTime.TryParse(trimmedRow[9], out DateTime lastActivityTime);
             var completionTimeParsed = DateTime.TryParse(trimmedRow[9], out DateTime completionTime);
-            var gradePased = double.TryParse(trimmedRow[19].Replace('.',','), out var grade);
+            var gradeParsed = double.TryParse(trimmedRow[19].Replace('.',','), out var grade);
             var progressParsed = double.TryParse(trimmedRow[11].Replace('.',','), out var progress);
             var learningHours = double.TryParse(trimmedRow[12].Replace('.',','), out var hours);
             return new Course
