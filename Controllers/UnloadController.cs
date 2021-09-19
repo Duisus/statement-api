@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿using System.Collections.Generic;
+using System.IO;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Server.Managers.Interfaces;
@@ -27,6 +28,24 @@ namespace Server.Controllers
             {
                 var filePath = Path.Combine(_appSettings.Path, _appSettings.UnloadSpecializationFileName) + ".xlsx";
                 var fileName = _appSettings.UnloadSpecializationFileName + ".xlsx";
+                var fileBytes = await System.IO.File.ReadAllBytesAsync(filePath);
+                
+                System.IO.File.Delete(filePath);
+                
+                return File(fileBytes, "application/force-download", fileName);
+            }
+
+            return BadRequest();
+        }
+        
+        [HttpPost("courses")]
+        public async Task<ActionResult> UnloadByCoursesAsync([FromBody] List<string> courses)
+        {
+            var result = await _unloadManager.UnloadByCoursesAsync(courses);
+            if (result.IsSuccess)
+            {
+                var filePath = Path.Combine(_appSettings.Path, _appSettings.UnloadCoursesFileName) + ".xlsx";
+                var fileName = _appSettings.UnloadCoursesFileName + ".xlsx";
                 var fileBytes = await System.IO.File.ReadAllBytesAsync(filePath);
                 
                 System.IO.File.Delete(filePath);

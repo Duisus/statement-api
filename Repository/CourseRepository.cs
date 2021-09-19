@@ -31,5 +31,20 @@ namespace Server.Repository
                 return OperationResult<List<Course>>.Error(e.Message);
             }
         }
+
+        public async Task<OperationResult<List<Course>>> GetByTitleAsync(string title)
+        {
+            await using var connection = new SqlConnection(_dbConnection);
+            var sql = $"SELECT * FROM [{nameof(Course)}] WHERE {nameof(Course.Title)} = '{title}'";
+            try
+            {
+                var result = await connection.QueryAsync<Course>(sql);
+                return OperationResult<List<Course>>.Success(result.ToList());
+            }
+            catch (Exception e)
+            {
+                return OperationResult<List<Course>>.Error(e.Message);
+            }
+        }
     }
 }

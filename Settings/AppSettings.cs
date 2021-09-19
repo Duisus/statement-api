@@ -40,5 +40,9 @@ namespace Server.Settings
             .GetSection(FileSection)
             .GetValue<string>("UnloadSpecializationFileName");
         
+        public string UnloadCoursesFileName => _configuration
+            .GetSection(FileSection)
+            .GetValue<string>("UnloadCoursesFileName");
+        
     }
 }

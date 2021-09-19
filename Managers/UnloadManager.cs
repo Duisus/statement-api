@@ -1,8 +1,6 @@
 ﻿using System.Collections.Generic;
-using System.Globalization;
 using System.IO;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using Server.Logic;
 using Server.Managers.Interfaces;
@@ -38,7 +36,7 @@ namespace Server.Managers
 
             var specializations = getSpecializationsResult.Data;
             var possibleCoursesCount = new Dictionary<string, int>();
-            var possibleCourses = new List<string>();
+            List<string> possibleCourses;
             foreach (var specialization in specializations)
             {
                 var getCourses = await _courseRepository.GetBySpecializationIdAsync(specialization.Id);
@@ -69,7 +67,7 @@ namespace Server.Managers
             //appending header
             var cell = sheet.Cells[0,0];
             cell.PutValue("ФИО студента");
-            for (int i = 0; i < possibleCourses.Count; i++)
+            for (var i = 0; i < possibleCourses.Count; i++)
             {
                 cell = sheet.Cells[0,i + 1];
                 cell.PutValue(possibleCourses.ElementAt(i));
@@ -110,9 +108,38 @@ namespace Server.Managers
             return OperationResult.Success();
         }
 
-        public async Task<OperationResult> UnloadByCoursesAsync(List<string> courses)
+        public async Task<OperationResult> UnloadByCoursesAsync(List<string> courseTitles)
         {
-            throw new System.NotImplementedException();
+            var workbook = new Workbook();
+            var sheet = workbook.Worksheets[0];
+            var row = 0;
+            var column = 0;
+            foreach (var courseTitle in courseTitles)
+            {
+                var getCourses = await _courseRepository.GetByTitleAsync(courseTitle);
+                if (!getCourses.IsSuccess)
+                {
+                    return OperationResult.Error("Ошибка при получении курса с названием " + courseTitle);
+                }
+
+                var courses = getCourses.Data;
+                sheet.Cells[row, column].PutValue("ФИО студента");
+                sheet.Cells[row, column + 1].PutValue(courseTitle);
+                
+                foreach (var course in courses)
+                {
+                    var student = await _studentRepository.GetAsync(course.StudentId);
+                    row += 1;
+                    column = 0;
+                    sheet.Cells[row,column].PutValue(student.Data.FullName);
+                    sheet.Cells[row, column + 1].PutValue(course.IsCompleted ? 100 : 0);
+                }
+
+                row += 2;
+            }
+            sheet.AutoFitColumns();
+            workbook.Save(Path.Combine(_appSettings.Path, _appSettings.UnloadCoursesFileName) + ".xlsx");
+            return OperationResult.Success();
         }
     }
 }
