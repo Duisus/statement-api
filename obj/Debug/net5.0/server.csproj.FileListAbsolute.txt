@@ -84,3 +84,4 @@ C:\Users\Aidar\Desktop\Server\bin\Debug\net5.0\Serilog.Sinks.File.dll
 C:\Users\Aidar\Desktop\Server\bin\Debug\net5.0\AutoMapper.dll
 C:\Users\Aidar\Desktop\Server\bin\Debug\net5.0\AutoMapper.Extensions.Microsoft.DependencyInjection.dll
 C:\Users\Aidar\Desktop\Server\bin\Debug\net5.0\Json.Net.dll
+C:\Users\Aidar\Desktop\Server\bin\Debug\net5.0\Aspose.Cells.dll

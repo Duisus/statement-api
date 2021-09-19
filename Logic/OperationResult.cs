@@ -42,7 +42,7 @@
             };
         }
         
-        public static OperationResult<T> Error(string errorText, int statusCode = 400)
+        public new static OperationResult<T> Error(string errorText, int statusCode = 400)
         {
             return new OperationResult<T>()
             {

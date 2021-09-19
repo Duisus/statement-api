@@ -2,6 +2,19 @@
   "version": 3,
   "targets": {
     "net5.0": {
+      "Aspose.Cells/21.9.0": {
+        "type": "package",
+        "dependencies": {
+          "System.Drawing.Common": "4.7.0",
+          "System.Text.Encoding.CodePages": "4.7.0"
+        },
+        "compile": {
+          "lib/net50/Aspose.Cells.dll": {}
+        },
+        "runtime": {
+          "lib/net50/Aspose.Cells.dll": {}
+        }
+      },
       "AutoMapper/10.1.1": {
         "type": "package",
         "dependencies": {
@@ -1040,7 +1053,7 @@
           "Microsoft.Win32.SystemEvents": "4.7.0"
         },
         "compile": {
-          "ref/netcoreapp3.0/_._": {}
+          "ref/netcoreapp3.0/System.Drawing.Common.dll": {}
         },
         "runtime": {
           "lib/netstandard2.0/System.Drawing.Common.dll": {}
@@ -1510,7 +1523,7 @@
           "Microsoft.NETCore.Platforms": "3.1.0"
         },
         "compile": {
-          "lib/netstandard2.0/_._": {}
+          "lib/netstandard2.0/System.Text.Encoding.CodePages.dll": {}
         },
         "runtime": {
           "lib/netstandard2.0/System.Text.Encoding.CodePages.dll": {}
@@ -1679,6 +1692,36 @@
     }
   },
   "libraries": {
+    "Aspose.Cells/21.9.0": {
+      "sha512": "2neIhasbejffvPb5JfzJeVgIjFctoDVrOdNs08j3awXFbBN/jFrhDZP/4vQbkoYCKdmWax6z8WClUe9QQvBUnA==",
+      "type": "package",
+      "path": "aspose.cells/21.9.0",
+      "files": [
+        ".nupkg.metadata",
+        ".signature.p7s",
+        "Help/Aspose.Cells For .NET Documentation.chm",
+        "Help/Aspose.Cells.GridJs for .NETSTANDARD Documentation.chm",
+        "License/thirdpartylicenses.Aspose.Cells.for.NET.pdf",
+        "aspose.cells.21.9.0.nupkg.sha512",
+        "aspose.cells.nuspec",
+        "lib/MonoAndroid44/Aspose.Cells.dll",
+        "lib/MonoAndroid44/Aspose.Cells.xml",
+        "lib/net20/Aspose.Cells.dll",
+        "lib/net20/Aspose.Cells.xml",
+        "lib/net35/Aspose.Cells.dll",
+        "lib/net35/Aspose.Cells.xml",
+        "lib/net40-client/Aspose.Cells.dll",
+        "lib/net40-client/Aspose.Cells.xml",
+        "lib/net40/Aspose.Cells.dll",
+        "lib/net40/Aspose.Cells.xml",
+        "lib/net50/Aspose.Cells.dll",
+        "lib/net50/Aspose.Cells.xml",
+        "lib/netstandard20/Aspose.Cells.dll",
+        "lib/netstandard20/Aspose.Cells.xml",
+        "lib/xamarinios10/Aspose.Cells.dll",
+        "lib/xamarinios10/Aspose.Cells.xml"
+      ]
+    },
     "AutoMapper/10.1.1": {
       "sha512": "uMgbqOdu9ZG5cIOty0C85hzzayBH2i9BthnS5FlMqKtMSHDv4ts81a2jS1VFaDBVhlBeIqJ/kQKjQY95BZde9w==",
       "type": "package",
@@ -5847,6 +5890,7 @@
   },
   "projectFileDependencyGroups": {
     "net5.0": [
+      "Aspose.Cells >= 21.9.0",
       "AutoMapper >= 10.1.1",
       "AutoMapper.Extensions.Microsoft.DependencyInjection >= 8.1.1",
       "Dapper >= 2.0.90",
@@ -5899,6 +5943,10 @@
       "net5.0": {
         "targetAlias": "net5.0",
         "dependencies": {
+          "Aspose.Cells": {
+            "target": "Package",
+            "version": "[21.9.0, )"
+          },
           "AutoMapper": {
             "target": "Package",
             "version": "[10.1.1, )"

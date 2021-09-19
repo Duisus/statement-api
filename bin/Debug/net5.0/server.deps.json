@@ -25,6 +25,7 @@
     ".NETCoreApp,Version=v5.0": {
       "Server/1.0.0": {
         "dependencies": {
+          "Aspose.Cells": "21.9.0",
           "AutoMapper": "10.1.1",
           "AutoMapper.Extensions.Microsoft.DependencyInjection": "8.1.1",
           "Dapper": "2.0.90",
@@ -325,6 +326,21 @@
         },
         "compile": {
           "Server.dll": {}
+        }
+      },
+      "Aspose.Cells/21.9.0": {
+        "dependencies": {
+          "System.Drawing.Common": "4.7.0",
+          "System.Text.Encoding.CodePages": "4.7.0"
+        },
+        "runtime": {
+          "lib/net50/Aspose.Cells.dll": {
+            "assemblyVersion": "21.9.0.0",
+            "fileVersion": "21.9.0.0"
+          }
+        },
+        "compile": {
+          "lib/net50/Aspose.Cells.dll": {}
         }
       },
       "AutoMapper/10.1.1": {
@@ -1246,6 +1262,9 @@
         "dependencies": {
           "Microsoft.NETCore.Platforms": "3.1.0",
           "Microsoft.Win32.SystemEvents": "4.7.0"
+        },
+        "compile": {
+          "ref/netcoreapp3.0/System.Drawing.Common.dll": {}
         }
       },
       "System.Dynamic.Runtime/4.0.11": {
@@ -3308,6 +3327,13 @@
       "type": "project",
       "serviceable": false,
       "sha512": ""
+    },
+    "Aspose.Cells/21.9.0": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-2neIhasbejffvPb5JfzJeVgIjFctoDVrOdNs08j3awXFbBN/jFrhDZP/4vQbkoYCKdmWax6z8WClUe9QQvBUnA==",
+      "path": "aspose.cells/21.9.0",
+      "hashPath": "aspose.cells.21.9.0.nupkg.sha512"
     },
     "AutoMapper/10.1.1": {
       "type": "package",

@@ -1,9 +1,10 @@
 {
   "version": 2,
-  "dgSpecHash": "xZB68XM41uC7OlE0bBOfDHsD2QKgkUevtU4TI/39FlhOQNWaOCDcgdpGssDVSFw3lsqDVtPcS1P7Vsql19QuVg==",
+  "dgSpecHash": "dF383x6i0DQBW9FQOz76z5zxCSyT4p6LBRlaiiozUCLk65A9cqqVWw7XiZPt/kGxQ7/wnLoLjby6DtamYXHDkg==",
   "success": true,
   "projectFilePath": "C:\\Users\\Aidar\\Desktop\\Server\\Server.csproj",
   "expectedPackageFiles": [
+    "C:\\Users\\Aidar\\.nuget\\packages\\aspose.cells\\21.9.0\\aspose.cells.21.9.0.nupkg.sha512",
     "C:\\Users\\Aidar\\.nuget\\packages\\automapper\\10.1.1\\automapper.10.1.1.nupkg.sha512",
     "C:\\Users\\Aidar\\.nuget\\packages\\automapper.extensions.microsoft.dependencyinjection\\8.1.1\\automapper.extensions.microsoft.dependencyinjection.8.1.1.nupkg.sha512",
     "C:\\Users\\Aidar\\.nuget\\packages\\dapper\\2.0.90\\dapper.2.0.90.nupkg.sha512",

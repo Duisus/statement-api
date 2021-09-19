@@ -31,6 +31,12 @@ namespace Server.Models
             return Equals(obj as Assignment);
         }
 
+        public override int GetHashCode()
+        {
+            // ReSharper disable once BaseObjectGetHashCodeCallInGetHashCode
+            return base.GetHashCode();
+        }
+
         private bool Equals(Assignment assignment)
         {
             if (assignment is null) return false;

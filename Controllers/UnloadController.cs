@@ -17,17 +17,19 @@ namespace Server.Controllers
         {
             _unloadManager = unloadManager;
             _appSettings = appSettings;
-        }
+        }   
 
-        [HttpGet("specialization/{title}")]
-        public async Task<ActionResult> UnloadBySpecializationAsync(string title)
+        [HttpPost("specialization")]
+        public async Task<ActionResult> UnloadBySpecializationAsync([FromBody] string specializationName)
         {
-            var result = await _unloadManager.UnloadBySpecializationAsync(title);
+            var result = await _unloadManager.UnloadBySpecializationAsync(specializationName);
             if (result.IsSuccess)
             {
-                var filePath = Path.Combine(_appSettings.Path, _appSettings.UnloadSpecializationFileName) + ".csv";
-                var fileName = _appSettings.UnloadSpecializationFileName + ".csv";
+                var filePath = Path.Combine(_appSettings.Path, _appSettings.UnloadSpecializationFileName) + ".xlsx";
+                var fileName = _appSettings.UnloadSpecializationFileName + ".xlsx";
                 var fileBytes = await System.IO.File.ReadAllBytesAsync(filePath);
+                
+                System.IO.File.Delete(filePath);
                 
                 return File(fileBytes, "application/force-download", fileName);
             }
