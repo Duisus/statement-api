@@ -62,7 +62,7 @@ namespace Migrations
                     .WithColumn("IsCompleted").AsBoolean()
                     .WithColumn("Progress").AsDouble()
                     .WithColumn("Grade").AsFloat()
-                    .WithColumn("SertificateUrl").AsString().Nullable()
+                    .WithColumn("CertificateUrl").AsString().Nullable()
                     .WithColumn("LearningHours").AsFloat()
                     .WithColumn("University").AsString()
                     .WithColumn("EnrollmentTime").AsDateTime().Nullable()
@@ -75,7 +75,7 @@ namespace Migrations
 
         private void CreateAssignmentTable() 
         {
-            if (!Schema.Table("Assignment").Exists()) 
+            if (!Schema.Table("Assignment").Exists())
             {
                 Create.Table("Assignment")
                     .WithColumn("Id").AsInt64().PrimaryKey().Identity()
@@ -85,8 +85,9 @@ namespace Migrations
                     .WithColumn("AttemptGrade").AsFloat()
                     .WithColumn("GradeAfterOverride").AsFloat().Nullable()
                     .WithColumn("IsAttemptPassed").AsBoolean()
-                    .WithColumn("AttemptTimestampt").AsDateTime()
-                    .WithColumn("ItemAttemptOrderNumber").AsInt64();
+                    .WithColumn("AttemptTimestamp").AsDateTime()
+                    .WithColumn("ItemAttemptOrderNumber").AsInt64()
+                    .WithColumn("CourseName").AsString();
             }
         }
     }

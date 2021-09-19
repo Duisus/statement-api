@@ -16,6 +16,6 @@ namespace Server.Managers.Interfaces
         public Task<OperationResult<T>> UploadFormFileAsync<T>(
             string fileName,
             IBaseRepository<T> repo, 
-            Func<string, Task<OperationResult<List<T>>>> parser);
+            Func<string, Task<OperationResult<List<T>>>> parser)  where T : class;
     }
 }

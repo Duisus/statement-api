@@ -246,9 +246,9 @@ namespace Server.Managers
             var startTimeParsed = DateTime.TryParse(trimmedRow[9], out DateTime startTime);
             var lastActivityTimeParsed = DateTime.TryParse(trimmedRow[9], out DateTime lastActivityTime);
             var completionTimeParsed = DateTime.TryParse(trimmedRow[9], out DateTime completionTime);
-            var gradeParsed = double.TryParse(trimmedRow[19].Replace('.',','), out var grade);
-            var progressParsed = double.TryParse(trimmedRow[11].Replace('.',','), out var progress);
-            var learningHours = double.TryParse(trimmedRow[12].Replace('.',','), out var hours);
+            double.TryParse(trimmedRow[19].Replace('.',','), out var grade);
+            double.TryParse(trimmedRow[11].Replace('.',','), out var progress);
+            double.TryParse(trimmedRow[12].Replace('.',','), out var hours);
             return new Course
             {
                 Title = trimmedRow[3],
@@ -260,7 +260,7 @@ namespace Server.Managers
                 Grade = grade,
                 IsCompleted = trimmedRow[13] == "Yes",
                 Progress = progress,
-                SertificateUrl = trimmedRow[20],
+                CertificateUrl = trimmedRow[20],
                 LearningHours = hours,
                 University = trimmedRow[6]
             };
@@ -269,17 +269,18 @@ namespace Server.Managers
         private Assignment CreateAssignmentWithoutStudentId(string[] row)
         {
             var trimmedRow = row.ToList().Select(item => item.Trim('\"')).ToArray();   
-            var attemptTimestampParsed = DateTime.TryParse(trimmedRow[13], out DateTime attemptTimestampt);
-            var gradeAfterOverrideParsed = double.TryParse(trimmedRow[11].Replace('.',','), out double gradeAfterOvveride);
+            var attemptTimestampParsed = DateTime.TryParse(trimmedRow[13], out DateTime attemptTimestamp);
+            var gradeAfterOverrideParsed = double.TryParse(trimmedRow[11].Replace('.',','), out var gradeAfterOverride);
             return new Assignment
             {
                 Title = row[8],
                 AttemptGrade = double.Parse(trimmedRow[10].Replace('.',',')),
-                AttemptTimestampt = attemptTimestampParsed ? attemptTimestampt : null,
-                GradeAfterOverride = gradeAfterOverrideParsed ? gradeAfterOvveride : null,
+                AttemptTimestamp = attemptTimestampParsed ? attemptTimestamp : null,
+                GradeAfterOverride = gradeAfterOverrideParsed ? gradeAfterOverride : null,
                 IsAttemptPassed = trimmedRow[12] == "Yes",
                 ItemAttemptOrderNumber = int.Parse(trimmedRow[14]),
-                Order = int.Parse(trimmedRow[9])
+                Order = int.Parse(trimmedRow[9]),
+                CourseName = trimmedRow[5]
             };
         }
     }

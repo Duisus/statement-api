@@ -1,10 +1,9 @@
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
-using Server.Dto;
+using Server.Dto.ResponseDto;
 using Server.Repository.Interfaces;
 using Server.Managers.Interfaces;
-using Server.Models;
 using Server.Settings;
 
 namespace Server.Controllers 
@@ -53,7 +52,7 @@ namespace Server.Controllers
         }
         
         [HttpGet]
-        public async Task<ActionResult<GetAllCoursesRequestDto>> GetAllCoursesAsync()
+        public async Task<ActionResult<GetAllCoursesResponseDto>> GetAllCoursesAsync()
         {
             var courses = await _courseRepository.GetAllAsync();
             var result = courses
@@ -61,7 +60,7 @@ namespace Server.Controllers
                 .Select(spec => spec.FirstOrDefault()?.Title)
                 .ToList();
             
-            return Ok(new GetAllCoursesRequestDto() {Courses = result});
+            return Ok(new GetAllCoursesResponseDto() {Courses = result});
         }
     }
 }

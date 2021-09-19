@@ -6,6 +6,7 @@
         string SpecializationsFileName { get; }
         string CoursesFileName { get; }
         string AssignmentFileName { get; }
+        string UnloadSpecializationFileName { get; }
         
         /// <summary>
         /// Куда сохранять файлы

@@ -35,5 +35,10 @@ namespace Server.Settings
         public string Path => _configuration
             .GetSection(FileSection)
             .GetValue<string>("Path");
+        
+        public string UnloadSpecializationFileName => _configuration
+            .GetSection(FileSection)
+            .GetValue<string>("UnloadSpecializationFileName");
+        
     }
 }

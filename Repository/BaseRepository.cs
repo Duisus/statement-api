@@ -19,6 +19,19 @@ namespace Server.Repository
         {
             _dbConnection = configuration.GetValue<string>("ConnectionString");
         }
+
+        public async Task<OperationResult<T>> GetAsync(int id)
+        {
+            await using var connection = new SqlConnection(_dbConnection);
+            var result = await connection.GetAsync<T>(id);
+            if (result is not null)
+            {
+                return OperationResult<T>.Success(result);
+            }
+
+            return OperationResult<T>.Error($"Не удалось найти запись с id {id} в таблице {nameof(T)}");
+        }
+
         public async Task<long> AddAsync(T item)
         {
             await using var connection = new SqlConnection(_dbConnection);
@@ -26,7 +39,7 @@ namespace Server.Repository
             return addResult;
         }
 
-        public async Task<OperationResult<long>> AddMultipleAsync(IEnumerable<T> items)
+        public async Task<OperationResult> AddMultipleAsync(IEnumerable<T> items)
         {
             await using var connection = new SqlConnection(_dbConnection);
             var propNames = typeof(T)
@@ -43,12 +56,12 @@ namespace Server.Repository
                 }
                 catch (Exception e)
                 {
-                    return OperationResult<long>.Error(e.Message);
+                    return OperationResult.Error(e.Message);
                 }
                 
             }
 
-            return OperationResult<long>.Success();
+            return OperationResult.Success();
         }
 
         public async Task<List<T>> GetByStudentIdColumnAsync(int studentId)
@@ -72,13 +85,6 @@ namespace Server.Repository
             await using var connection = new SqlConnection(_dbConnection);
             var items = await connection.QueryAsync<T>(sql);
             return items.ToList();
-        }
-
-        public async Task<T> GetAsync(int id)
-        {
-            await using var connection = new SqlConnection(_dbConnection);
-            var item = (await connection.QueryAsync<T>($"SELECT * FROM [{typeof(T).Name}] WHERE Id = {id}")).FirstOrDefault();
-            return item;
         }
     }
 }

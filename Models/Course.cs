@@ -13,14 +13,14 @@ namespace Server.Models
         public int StudentId { get; set; }
 
         public string Title { get; set; }
-
-        public double Progress {get;set;}
-
+        
         public bool IsCompleted { get; set; }
 
+        public double Progress {get;set;}
+        
         public double Grade {get;set;}
 
-        public string SertificateUrl { get; set; }
+        public string CertificateUrl { get; set; }
 
         public double LearningHours { get; set; }
 
@@ -53,7 +53,7 @@ namespace Server.Models
                 Math.Abs(Progress - course.Progress) < 0.15 &&
                 IsCompleted == course.IsCompleted &&
                 Math.Abs(Grade - course.Grade) < 0.15 &&
-                SertificateUrl == course.SertificateUrl &&
+                CertificateUrl == course.CertificateUrl &&
                 Math.Abs(LearningHours - course.LearningHours) < 0.15 &&
                 University == course.University &&
                 EnrollmentTime == course.EnrollmentTime &&

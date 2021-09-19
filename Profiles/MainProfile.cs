@@ -1,5 +1,7 @@
 ﻿using AutoMapper;
 using Server.Dto;
+using server.Dto.ModelDto;
+using Server.Dto.ModelDto;
 using Server.Models;
 
 namespace Server.Profiles
@@ -8,9 +10,9 @@ namespace Server.Profiles
     {
         public MainProfile()
         {
+            CreateMap<Specialization, SpecializationDto>()
+                .ForMember(dest => dest.Courses, opt => opt.Ignore());
             CreateMap<Course, CourseDto>();
-            CreateMap<Student, StudentDto>();
-            CreateMap<Specialization, SpecializationDto>();
             CreateMap<Assignment, AssignmentDto>();
         }
     }

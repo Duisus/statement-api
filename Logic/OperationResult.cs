@@ -1,15 +1,14 @@
 ﻿namespace Server.Logic
 {
-    public class OperationResult<T>
+    public class OperationResult
     {
         public bool IsSuccess { get; set; }
         public string ErrorText { get; set; }
         public int StatusCode { get; set; }
-        public T Data { get; set; }
-
-        public static OperationResult<T> Success(int statusCode = 200)
+        
+        public static OperationResult Success(int statusCode = 200)
         {
-            return new OperationResult<T>
+            return new OperationResult
             {
                 IsSuccess = true,
                 ErrorText = null,
@@ -17,7 +16,22 @@
             };
         }
         
-        public static OperationResult<T> Success(T data, int statusCode = 200)
+        public static OperationResult Error(string errorText, int statusCode = 400)
+        {
+            return new OperationResult()
+            {
+                IsSuccess = false,
+                ErrorText = errorText,
+                StatusCode = statusCode
+            };
+        }
+    }
+    
+    public class OperationResult<T> : OperationResult where T : class
+    {
+        public T Data { get; set; }
+
+        public static OperationResult<T> Success(T data = null, int statusCode = 200)
         {
             return new OperationResult<T>
             {

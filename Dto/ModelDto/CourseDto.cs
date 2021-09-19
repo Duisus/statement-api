@@ -1,7 +1,9 @@
 ﻿using System;
+using System.Collections.Generic;
 using Newtonsoft.Json;
+using server.Dto.ModelDto;
 
-namespace Server.Dto
+namespace Server.Dto.ModelDto
 {
     public class CourseDto
     {
@@ -17,8 +19,8 @@ namespace Server.Dto
         [JsonProperty("grade")]
         public double Grade {get;set;}
 
-        [JsonProperty("sertificateUrl")]
-        public string SertificateUrl { get; set; }
+        [JsonProperty("certificateUrl")]
+        public string CertificateUrl { get; set; }
 
         [JsonProperty("learningHours")]
         public double LearningHours { get; set; }
@@ -40,5 +42,8 @@ namespace Server.Dto
 
         [JsonProperty("completionTime")]
         public DateTime? CompletionTime { get; set; }
+
+        [JsonProperty("assignments")]
+        public List<AssignmentDto> Assignments { get; set; } = new List<AssignmentDto>();
     }
 }

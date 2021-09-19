@@ -4,9 +4,9 @@ using Server.Logic;
 
 namespace Server.Repository.Interfaces 
 {
-    public interface IBaseRepository<T>
+    public interface IBaseRepository<T> where T : class
     {
-        public Task<T> GetAsync(int id);
+        public Task<OperationResult<T>> GetAsync(int id);
 
         /// <summary>
         /// Добавить и получить Id
@@ -19,9 +19,9 @@ namespace Server.Repository.Interfaces
         public Task<List<T>> GetAllAsync();
 
         /// <summary>
-        /// Добавить несколько записей и получить их Id
+        /// Добавить несколько записей
         ///</summary>
-        public Task<OperationResult<long>> AddMultipleAsync(IEnumerable<T> items);
+        public Task<OperationResult> AddMultipleAsync(IEnumerable<T> items);
 
         public Task<List<T>> GetByStudentIdColumnAsync(int studentId);
 

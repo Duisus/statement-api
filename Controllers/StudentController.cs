@@ -4,6 +4,10 @@ using System.Threading.Tasks;
 using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
 using Server.Dto;
+using server.Dto.ModelDto;
+using Server.Dto.ModelDto;
+using Server.Dto.RequestDto;
+using Server.Dto.ResponseDto;
 using Server.Repository.Interfaces;
 using Server.Managers.Interfaces;
 using Server.Models;
@@ -24,6 +28,7 @@ namespace Server.Controllers
         private readonly IAssignmentRepository _assignmentRepository;
         private readonly IMapper _mapper;
         private readonly IUploadManager _uploadManager;
+        private readonly IDataManager _dataManager;
 
         public StudentController(
             IStudentRepository studentRepository,
@@ -33,7 +38,8 @@ namespace Server.Controllers
             ISpecializationRepository specializationRepository,
             ICourseRepository courseRepository,
             IAssignmentRepository assignmentRepository, 
-            IMapper mapper, IUploadManager uploadManager)
+            IMapper mapper, IUploadManager uploadManager, 
+            IDataManager dataManager)
         {
             _studentRepository = studentRepository;
             _csvParserManager = csvParserManager;
@@ -44,17 +50,14 @@ namespace Server.Controllers
             _assignmentRepository = assignmentRepository;
             _mapper = mapper;
             _uploadManager = uploadManager;
+            _dataManager = dataManager;
         }
 
-        [HttpGet("{id:int}")]
-        public async Task<ActionResult<Student>> GetStudentAsync(int id) 
+        [HttpPost]
+        public async Task<ActionResult<GetStudentsResponseDto>> GetStudentAsync(GetStudentsRequestDto dto)
         {
-            var result = await _studentRepository.GetAsync(id);
-            if (result != null) 
-            {
-                return Ok(result);
-            }
-            return NotFound();
+            var result = await _dataManager.GetStudentsAsync(dto);
+            return Ok(result);
         }
         
         [HttpGet("addfromfile")]
@@ -72,53 +75,16 @@ namespace Server.Controllers
 
             return Ok("Студенты успешно добавлены в базу данных");
         }
-        
-        [HttpGet]
-        public async Task<ActionResult<StudentDto>> GetAllStudentsAsync()
-        {
-            var result = await _studentRepository.GetAllAsync();
-            return Ok(result);
-        }
 
-        [HttpPost("withinfo")]
-        public async Task<ActionResult<List<GetStudentWithInfoRequestDto>>> GetStudentsWithInfoAsync([FromBody] GetStudentsWithInfoRequestDto dto)
+        [HttpGet("{id:int}")]
+        public async Task<ActionResult<StudentDto>> GetStudentByIdWithInfoDto(int id)
         {
-            var result = new List<GetStudentWithInfoRequestDto>();
-            var students = await _studentRepository.GetAllAsync();
-            foreach (var student in students)
+            var result = await _dataManager.GetStudentAsync(id);
+            if (!result.IsSuccess)
             {
-                var specializations = await _specializationRepository.GetByStudentIdColumnAsync(student.Id);
-                var courses = await _courseRepository.GetByStudentIdColumnAsync(student.Id);
-                var info = new GetStudentWithInfoRequestDto()
-                {
-                    Student = _mapper.Map<StudentDto>(student),
-                    Specializations = _mapper.Map<List<SpecializationDto>>(specializations),
-                    Courses = _mapper.Map<List<CourseDto>>(courses)
-                };
-                result.Add(info);
+                return BadRequest(result.ErrorText);
             }
-            return Ok(result);
-        }
-
-        [HttpGet("withinfo/{id:int}")]
-        public async Task<ActionResult<GetStudentWithInfoRequestDto>> GetStudentByIdWithInfoDto(int id)
-        {
-            var student = await _studentRepository.GetAsync(id);
-            if (student == null)
-            {
-                return NotFound();
-            }
-
-            var specializations = await _specializationRepository.GetByStudentIdColumnAsync(student.Id);
-            var courses = await _courseRepository.GetByStudentIdColumnAsync(student.Id);
-            var assignments = await _assignmentRepository.GetByStudentIdColumnAsync(student.Id);
-            return Ok(new GetStudentWithInfoRequestDto()
-            {
-                Student = _mapper.Map<StudentDto>(student),
-                Assignments = _mapper.Map<List<AssignmentDto>>(assignments),
-                Courses = _mapper.Map<List<CourseDto>>(courses),
-                Specializations = _mapper.Map<List<SpecializationDto>>(specializations)
-            });
+            return Ok(result.Data);
         }
     }
 }

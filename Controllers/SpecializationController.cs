@@ -1,10 +1,9 @@
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
-using Server.Dto;
+using Server.Dto.ResponseDto;
 using Server.Repository.Interfaces;
 using Server.Managers.Interfaces;
-using Server.Models;
 using Server.Settings;
 
 namespace Server.Controllers 
@@ -47,7 +46,7 @@ namespace Server.Controllers
         }
 
         [HttpGet]
-        public async Task<ActionResult<GetAllSpecializationsRequestDto>> GetAllSpecializationsAsync()
+        public async Task<ActionResult<GetAllSpecializationsResponseDto>> GetAllSpecializationsAsync()
         {
             var specializations = await _specializationRepository.GetAllAsync();
             var result = specializations
@@ -55,7 +54,7 @@ namespace Server.Controllers
                 .Select(spec => spec.FirstOrDefault()?.Title)
                 .ToList();
             
-            return Ok(new GetAllSpecializationsRequestDto() {Specializations = result});
+            return Ok(new GetAllSpecializationsResponseDto() {Specializations = result});
         }
     }
 }

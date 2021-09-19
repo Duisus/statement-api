@@ -1,7 +1,7 @@
 ﻿using System;
 using Newtonsoft.Json;
 
-namespace Server.Dto
+namespace server.Dto.ModelDto
 {
     public class AssignmentDto
     {
@@ -20,10 +20,13 @@ namespace Server.Dto
         [JsonProperty("isAttemptPassed")]
         public bool IsAttemptPassed { get; set; }
 
-        [JsonProperty("attemptTimestampt")]
-        public DateTime? AttemptTimestampt { get; set; }
+        [JsonProperty("attemptTimestamp")]
+        public DateTime? AttemptTimestamp { get; set; }
 
         [JsonProperty("itemAttemptOrderNumber")]
         public int ItemAttemptOrderNumber { get; set; }
+        
+        [JsonProperty("courseName")]
+        public string CourseName { get; set; }
     }
 }

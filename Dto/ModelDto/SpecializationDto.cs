@@ -1,6 +1,7 @@
-﻿using Newtonsoft.Json;
+﻿using System.Collections.Generic;
+using Newtonsoft.Json;
 
-namespace Server.Dto
+namespace Server.Dto.ModelDto
 {
     public class SpecializationDto
     {
@@ -18,5 +19,8 @@ namespace Server.Dto
         
         [JsonProperty("completedCourseCount")]
         public int CompletedCourseCount { get; set; }
+
+        [JsonProperty("courses")]
+        public List<CourseDto> Courses { get; set; } = new List<CourseDto>();
     }
 }

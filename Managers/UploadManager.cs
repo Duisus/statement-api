@@ -26,7 +26,7 @@ namespace Server.Managers
         public async Task<OperationResult<T>> UploadFormFileAsync<T>(
             string fileName,
             IBaseRepository<T> repo, 
-            Func<string, Task<OperationResult<List<T>>>> parser)
+            Func<string, Task<OperationResult<List<T>>>> parser) where T : class
         {
             var tag = $"{GetType()}.{nameof(UploadFormFileAsync)}";
             var file = await _fileRepository.GetByFileNameAsync(fileName);

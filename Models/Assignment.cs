@@ -20,9 +20,11 @@ namespace Server.Models
 
         public bool IsAttemptPassed { get; set; }
 
-        public DateTime? AttemptTimestampt { get; set; }
+        public DateTime? AttemptTimestamp { get; set; }
 
         public int ItemAttemptOrderNumber { get; set; }
+        
+        public string CourseName { get; set; }
 
         public override bool Equals(object obj)
         {
@@ -46,7 +48,8 @@ namespace Server.Models
                    && ((!assignment.GradeAfterOverride.HasValue && !GradeAfterOverride.HasValue) ||
                        Math.Abs(assignment.GradeAfterOverride.Value - GradeAfterOverride.Value) < 0.5)
                    && assignment.IsAttemptPassed == IsAttemptPassed
-                   && assignment.ItemAttemptOrderNumber == ItemAttemptOrderNumber;
+                   && assignment.ItemAttemptOrderNumber == ItemAttemptOrderNumber
+                   && assignment.CourseName == CourseName;
         }
     }
 }
