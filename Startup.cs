@@ -1,3 +1,5 @@
+using System;
+using System.IO;
 using System.Reflection;
 using AutoMapper;
 using FluentMigrator.Runner;
@@ -40,7 +42,14 @@ namespace Server
                 .AddLogging(lb => lb.AddFluentMigratorConsole());
 
              services.AddControllers();
-            services.AddSwaggerGen(c => { c.SwaggerDoc("v1", new OpenApiInfo {Title = "Server", Version = "v1"}); });
+            services.AddSwaggerGen(c =>
+            {
+                c.SwaggerDoc("v1", new OpenApiInfo {Title = "Server", Version = "v1"}); 
+                var xmlFile = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
+                var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
+                c.IncludeXmlComments(xmlPath);
+                
+            });
 
 
             //Репозитории
@@ -86,7 +95,11 @@ namespace Server
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
-                app.UseSwagger();
+                app.UseSwagger(c =>
+                {
+                    c.SerializeAsV2 = true;
+                });
+
                 app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "Server v1"));
             }
             
