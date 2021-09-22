@@ -27,7 +27,10 @@ namespace Server.Controllers
             _assignmentRepository = assignmentRepository;
             _csvParserManager = csvParserManager;
         }
-
+        
+        /// <summary>
+        /// Загрузить в базу данных задания курсов из файла (по умолчанию файл Ural Federal University Learning Program.csv)
+        /// </summary>
         [HttpGet("uploadfromfile")]
         public async Task<ActionResult> AddFromAssignmentFileAsync()
         {

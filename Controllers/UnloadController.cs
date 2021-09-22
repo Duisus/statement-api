@@ -20,6 +20,12 @@ namespace Server.Controllers
             _appSettings = appSettings;
         }   
 
+        /// <summary>
+        /// Выгрузить из таблицы Specialization, Course в виде файла формата xlsx всех студентов и их оценки за курсы на данной специализации
+        /// </summary>
+        /// <param name="specializationName">Название специализации</param>
+        /// <returns></returns>
+        [ProducesResponseType(typeof(FileContentResult), 200)]
         [HttpPost("specialization")]
         public async Task<ActionResult> UnloadBySpecializationAsync([FromBody] string specializationName)
         {
@@ -38,6 +44,12 @@ namespace Server.Controllers
             return BadRequest();
         }
         
+        /// <summary>
+        /// Выгрузить из таблицы Course в виде файла формата xlsx всех студентов и их оценки, выбравшие данные курсы
+        /// </summary>
+        /// <param name="courses">Название курсов</param>
+        /// <returns></returns>
+        [ProducesResponseType(typeof(FileContentResult), 200)]
         [HttpPost("courses")]
         public async Task<ActionResult> UnloadByCoursesAsync([FromBody] List<string> courses)
         {

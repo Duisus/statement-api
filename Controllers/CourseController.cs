@@ -12,29 +12,26 @@ namespace Server.Controllers
     [ApiController]
     public class CourseController : Controller 
     {
-        private readonly ISpecializationRepository _specializationRepository;
         private readonly ICsvParserManager _csvParserManager;
-        private readonly IFileRepository _fileRepository;
         private readonly IAppSettings _appSettings;
         private readonly ICourseRepository _courseRepository;
         private readonly IUploadManager _uploadManager;
 
         public CourseController(
-            ISpecializationRepository specializationRepository,
             ICsvParserManager csvParserManager,
-            IFileRepository fileRepository, 
             IAppSettings appSettings,
             ICourseRepository courseRepository,
             IUploadManager uploadManager)
         {
-            _specializationRepository = specializationRepository;
             _csvParserManager = csvParserManager;
-            _fileRepository = fileRepository;
             _appSettings = appSettings;
             _courseRepository = courseRepository;
             _uploadManager = uploadManager;
         }
-
+        
+        /// <summary>
+        /// Загрузить в базу данных курсы из файла (по умолчанию файл usage-report.csv)
+        /// </summary>
         [HttpGet("addfromfile")]
         public async Task<ActionResult> AddFromCoursesFileAsync()
         {
@@ -51,6 +48,10 @@ namespace Server.Controllers
             return Ok("Курсы успешно добавлены в базу данных");
         }
         
+        /// <summary>
+        /// Получить все названия курсов
+        /// </summary>
+        [ProducesResponseType(typeof(GetAllCoursesResponseDto), 200)]
         [HttpGet]
         public async Task<ActionResult<GetAllCoursesResponseDto>> GetAllCoursesAsync()
         {

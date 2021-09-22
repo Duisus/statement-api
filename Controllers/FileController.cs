@@ -24,6 +24,10 @@ namespace Server.Controllers
             _appSettings = appSettings;
         }
         
+        /// <summary>
+        /// Загрузить файл в папку, указанную в настройках. Также вставляется новая запись в базу данных с названием файла
+        /// </summary>
+        /// <returns>id вставленной записи в базе</returns>
         [ProducesResponseType(typeof(int),200)]
         [HttpPost("upload")]
         public async Task<ActionResult> UploadFileAsync(IFormFile uploadedFile)
@@ -56,6 +60,9 @@ namespace Server.Controllers
             return Ok(id);
         }
 
+        /// <summary>
+        /// Получить все записи в таблице FileModel
+        /// </summary>
         [HttpGet]
         [ProducesResponseType(typeof(IEnumerable<FileModel>),200)]
         public async Task<ActionResult<IEnumerable<FileModel>>> GetAllFilesAsync()
@@ -64,6 +71,9 @@ namespace Server.Controllers
             return Ok(result);
         }
         
+        /// <summary>
+        /// Получить запись в таблице FileModel по id
+        /// </summary>
         [HttpGet("{id:int}")]
         public async Task<ActionResult<FileModel>> GetFileAsync(int id) 
         {

@@ -29,6 +29,10 @@ namespace Server.Controllers
             _uploadManager = uploadManager;
         }
 
+        /// <summary>
+        /// Загрузить все специализации учеников из файла в базу данных в таблицу Specialization (по умолчанию файл specialization-report.csv
+        /// </summary>
+        /// <returns></returns>
         [HttpGet("addfromfile")]
         public async Task<ActionResult> AddFromSpeciazilationsFileAsync()
         {
@@ -45,6 +49,10 @@ namespace Server.Controllers
             return Ok("Специализации успешно добавлены в базу данных");
         }
 
+        /// <summary>
+        /// Получить все названия специализаций из таблицы Specialization
+        /// </summary>
+        /// <returns></returns>
         [HttpGet]
         public async Task<ActionResult<GetAllSpecializationsResponseDto>> GetAllSpecializationsAsync()
         {

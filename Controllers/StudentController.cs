@@ -21,38 +21,29 @@ namespace Server.Controllers
     {
         private readonly IStudentRepository _studentRepository;
         private readonly ICsvParserManager _csvParserManager;
-        private readonly IFileRepository _fileRepository;
         private readonly IAppSettings _appSettings;
-        private readonly ISpecializationRepository _specializationRepository;
-        private readonly ICourseRepository _courseRepository;
-        private readonly IAssignmentRepository _assignmentRepository;
-        private readonly IMapper _mapper;
         private readonly IUploadManager _uploadManager;
         private readonly IDataManager _dataManager;
 
         public StudentController(
             IStudentRepository studentRepository,
-            ICsvParserManager csvParserManager, 
-            IFileRepository fileRepository,
+            ICsvParserManager csvParserManager,
             IAppSettings appSettings,
-            ISpecializationRepository specializationRepository,
-            ICourseRepository courseRepository,
-            IAssignmentRepository assignmentRepository, 
-            IMapper mapper, IUploadManager uploadManager, 
+            IUploadManager uploadManager, 
             IDataManager dataManager)
         {
             _studentRepository = studentRepository;
             _csvParserManager = csvParserManager;
-            _fileRepository = fileRepository;
             _appSettings = appSettings;
-            _specializationRepository = specializationRepository;
-            _courseRepository = courseRepository;
-            _assignmentRepository = assignmentRepository;
-            _mapper = mapper;
             _uploadManager = uploadManager;
             _dataManager = dataManager;
         }
-
+        
+        /// <summary>
+        /// Получить студентов со следующей информацией:
+        /// ФИО, id в таблице Student, среднее кол-во часов обучения, средняя оценка за курс
+        /// </summary>
+        [ProducesResponseType(typeof(GetStudentsResponseDto), 200)]
         [HttpPost]
         public async Task<ActionResult<GetStudentsResponseDto>> GetStudentAsync(GetStudentsRequestDto dto)
         {
@@ -60,6 +51,10 @@ namespace Server.Controllers
             return Ok(result);
         }
         
+        /// <summary>
+        /// Загрузить студентов в таблицу Student из файла (по умолчанию membership-report.csv)
+        /// </summary>
+        /// <returns></returns>
         [HttpGet("addfromfile")]
         public async Task<ActionResult> AddFromStudentsFileAsync()
         {
@@ -76,6 +71,11 @@ namespace Server.Controllers
             return Ok("Студенты успешно добавлены в базу данных");
         }
 
+        /// <summary>
+        /// Получить информацию о студенте, его специализациях, курсах, заданиях
+        /// </summary>
+        /// <param name="id">id в таблице Studdent</param>
+        [ProducesResponseType(typeof(StudentDto), 200)]
         [HttpGet("{id:int}")]
         public async Task<ActionResult<StudentDto>> GetStudentByIdWithInfoDto(int id)
         {
