@@ -1,5 +1,6 @@
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Server.Dto.ResponseDto;
 using Server.Repository.Interfaces;
@@ -10,6 +11,7 @@ namespace Server.Controllers
 {
     [Route("courses")]
     [ApiController]
+    [Authorize]
     public class CourseController : Controller 
     {
         private readonly ICsvParserManager _csvParserManager;
