@@ -38,18 +38,18 @@ namespace server.Controllers
         }
 
         [HttpPost("LoginInner")]
-        public async Task<ActionResult> LoginInner([FromHeader] AuthDto auth, [FromQuery] string returnUrl)
+        public async Task<ActionResult> LoginInner( AuthDto auth, [FromQuery] string returnUrl)
         {
             var user =await _userRepository.SearchAsync(auth.Email, auth.Password);
             if (user == null || user.Count==0)
-                return Ok("неверный логин или пароль");
+                return NotFound("неверный логин или пароль");
 
-            if (user.Count != 1)
+            if (user.Count > 1)
                 return Conflict("внутренняя ошибка сервиса, обратитесь в тех поддержку");
 
             await Authenticate(auth.Email);
-
-            return Redirect(returnUrl);
+            var referer = Request.Headers["Referer"];
+            return Redirect(referer.Any()?referer.ToString():"/");
         }
 
         private async Task Authenticate(string userName)
