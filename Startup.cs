@@ -97,12 +97,16 @@ namespace Server
                 .AddCookie(options =>
                 {
                     options.LoginPath = new PathString("/Auth/Login");
+                   // options.Cookie.Name = "AIAIAI";
+                    //options.Cookie.Domain = "localhost.frontdev";
                 });
+            services.AddMvc();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
+            app.UseStaticFiles();
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
@@ -114,12 +118,14 @@ namespace Server
                 app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "Server v1"));
             }
             
-            app.UseCors("foo");
-
+            
+            
             app.UseHttpsRedirection();
 
             app.UseRouting();
-            
+
+            app.UseCors("foo");
+
             app.UseAuthorization();
             app.UseAuthentication();
 
