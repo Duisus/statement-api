@@ -3,3 +3,8 @@
 obj/
 bin/
 .vs/
+wwwroot/*
+server.sln
+server.csproj.user
+
+!wwwroot/Auth/

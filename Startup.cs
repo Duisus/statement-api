@@ -7,25 +7,24 @@ using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
-using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.OpenApi.Models;
 using Serilog;
-using Server.Repository;
-using Server.Repository.Interfaces;
 using Server.Managers;
 using Server.Managers.Interfaces;
 using Server.Profiles;
 using server.Repository;
+using Server.Repository;
+using Server.Repository.Interfaces;
 using Server.Settings;
 
 namespace Server
 {
     public class Startup
     {
-        readonly string MyAllowSpecificOrigins = "_myAllowSpecificOrigins";
+        private readonly string MyAllowSpecificOrigins = "_myAllowSpecificOrigins";
         
         public Startup(IConfiguration configuration)
         {
@@ -80,7 +79,7 @@ namespace Server
             {
                 mc.AddProfile(new MainProfile());
             });
-            IMapper mapper = mapperConfig.CreateMapper();
+            var mapper = mapperConfig.CreateMapper();
             services.AddSingleton(mapper);
 
             services.AddCors(options =>

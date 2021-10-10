@@ -20,9 +20,9 @@ namespace server.Repository
             
         }
 
-        public async Task<List<User>> SearchAsync(string email, string password)
+        public async Task<List<User>> SearchAsync(string email)
         {
-            var sql = $"SELECT * FROM [Users] WHERE email = \'{email}\' AND password = \'{password}\'";
+            var sql = $"SELECT * FROM [Users] WHERE email = \'{email}\'";
             await using var connection = new SqlConnection(_dbConnection);
             
             var items = await connection.QueryAsync<User>(sql);
