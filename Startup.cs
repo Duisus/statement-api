@@ -88,6 +88,7 @@ namespace Server
                     builder =>
                     {
                         // Not a permanent solution, but just trying to isolate the problem
+                        //кажется, уже не нужно
                         builder.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader();
                     });
             });
@@ -96,8 +97,6 @@ namespace Server
                 .AddCookie(options =>
                 {
                     options.LoginPath = new PathString("/Auth/Login");
-                   // options.Cookie.Name = "AIAIAI";
-                    //options.Cookie.Domain = "localhost.frontdev";
                 });
             services.AddMvc();
         }
@@ -125,8 +124,9 @@ namespace Server
 
             app.UseCors("foo");
 
-            app.UseAuthorization();
+            
             app.UseAuthentication();
+            app.UseAuthorization();
 
             app.UseEndpoints(endpoints => { endpoints.MapControllers(); });
 

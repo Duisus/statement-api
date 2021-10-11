@@ -33,7 +33,7 @@ namespace server.Controllers
         public async Task<ActionResult> LoginInner(AuthDto auth)
         {
             var user = await _userRepository.SearchAsync(auth.Email);
-            if (user == null || user.Count == 0)
+            if (user == null || user.Count == 0 || !IsDtoValid(auth))
                 return NotFound("неверный логин или пароль");
 
             if (user.Count > 1)
@@ -68,6 +68,11 @@ namespace server.Controllers
                 1000,
                 256 / 8));
             return hashedEnteredPassword == user.Password;
+        }
+
+        private static bool IsDtoValid(AuthDto dto)
+        {
+            return !string.IsNullOrWhiteSpace(dto.Password) && !string.IsNullOrWhiteSpace(dto.Email);
         }
     }
 }
