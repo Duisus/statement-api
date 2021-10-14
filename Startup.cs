@@ -3,25 +3,28 @@ using System.IO;
 using System.Reflection;
 using AutoMapper;
 using FluentMigrator.Runner;
+using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.OpenApi.Models;
 using Serilog;
-using Server.Repository;
-using Server.Repository.Interfaces;
 using Server.Managers;
 using Server.Managers.Interfaces;
 using Server.Profiles;
+using server.Repository;
+using Server.Repository;
+using Server.Repository.Interfaces;
 using Server.Settings;
 
 namespace Server
 {
     public class Startup
     {
-        readonly string MyAllowSpecificOrigins = "_myAllowSpecificOrigins";
+        private readonly string MyAllowSpecificOrigins = "_myAllowSpecificOrigins";
         
         public Startup(IConfiguration configuration)
         {
@@ -58,7 +61,8 @@ namespace Server
                 .AddTransient<ISpecializationRepository, SpecializationRepository>()
                 .AddTransient<ICourseRepository, CourseRepository>()
                 .AddTransient<IAssignmentRepository, AssignmentRepository>()
-                .AddTransient<IFileRepository, FileRepository>();
+                .AddTransient<IFileRepository, FileRepository>()
+                .AddSingleton<UserRepository, UserRepository>();
 
             //Managers
             services
@@ -75,7 +79,7 @@ namespace Server
             {
                 mc.AddProfile(new MainProfile());
             });
-            IMapper mapper = mapperConfig.CreateMapper();
+            var mapper = mapperConfig.CreateMapper();
             services.AddSingleton(mapper);
 
             services.AddCors(options =>
@@ -84,14 +88,23 @@ namespace Server
                     builder =>
                     {
                         // Not a permanent solution, but just trying to isolate the problem
+                        //кажется, уже не нужно
                         builder.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader();
                     });
             });
+
+            services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
+                .AddCookie(options =>
+                {
+                    options.LoginPath = new PathString("/Auth/Login");
+                });
+            services.AddMvc();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
+            app.UseStaticFiles();
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
@@ -103,12 +116,16 @@ namespace Server
                 app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "Server v1"));
             }
             
-            app.UseCors("foo");
-
+            
+            
             app.UseHttpsRedirection();
 
             app.UseRouting();
+
+            app.UseCors("foo");
+
             
+            app.UseAuthentication();
             app.UseAuthorization();
 
             app.UseEndpoints(endpoints => { endpoints.MapControllers(); });

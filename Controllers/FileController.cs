@@ -4,6 +4,8 @@ using System.IO;
 using System.IO.Compression;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Server.Models;
@@ -14,6 +16,8 @@ namespace Server.Controllers
 {
     [Route("files")]
     [ApiController]
+    [Authorize]
+    [Authorize(AuthenticationSchemes = CookieAuthenticationDefaults.AuthenticationScheme)]
     public class FileController : Controller
     {
         private readonly IFileRepository _fileRepository;

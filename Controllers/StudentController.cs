@@ -2,6 +2,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
+using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Server.Dto;
 using server.Dto.ModelDto;
@@ -17,6 +19,8 @@ namespace Server.Controllers
 {
     [Route("students")]
     [ApiController]
+    [Authorize]
+    [Authorize(AuthenticationSchemes = CookieAuthenticationDefaults.AuthenticationScheme)]
     public class StudentController : Controller 
     {
         private readonly IStudentRepository _studentRepository;

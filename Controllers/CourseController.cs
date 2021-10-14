@@ -1,6 +1,9 @@
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Net.Http.Headers;
 using Server.Dto.ResponseDto;
 using Server.Repository.Interfaces;
 using Server.Managers.Interfaces;
@@ -10,6 +13,8 @@ namespace Server.Controllers
 {
     [Route("courses")]
     [ApiController]
+    [Authorize]
+    [Authorize(AuthenticationSchemes = CookieAuthenticationDefaults.AuthenticationScheme)]
     public class CourseController : Controller 
     {
         private readonly ICsvParserManager _csvParserManager;
@@ -60,8 +65,7 @@ namespace Server.Controllers
                 .GroupBy(spec => spec.Title)
                 .Select(spec => spec.FirstOrDefault()?.Title)
                 .ToList();
-            
-            return Ok(new GetAllCoursesResponseDto() {Courses = result});
+            return  Ok(new GetAllCoursesResponseDto() {Courses = result});
         }
     }
 }

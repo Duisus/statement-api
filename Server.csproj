@@ -8,6 +8,16 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Include="wwwroot\static\css\main.410dd320.chunk.css.map" />
+    <None Include="wwwroot\static\js\2.2906cc3c.chunk.js" />
+    <None Include="wwwroot\static\js\2.2906cc3c.chunk.js.map" />
+    <None Include="wwwroot\static\js\main.b5d14635.chunk.js" />
+    <None Include="wwwroot\static\js\main.b5d14635.chunk.js.map" />
+    <None Include="wwwroot\static\js\runtime-main.b00b87a3.js" />
+    <None Include="wwwroot\static\js\runtime-main.b00b87a3.js.map" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="Aspose.Cells" Version="21.9.0" />
     <PackageReference Include="AutoMapper" Version="10.1.1" />
     <PackageReference Include="AutoMapper.Extensions.Microsoft.DependencyInjection" Version="8.1.1" />

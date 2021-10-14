@@ -1,6 +1,8 @@
 ﻿using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Server.Managers.Interfaces;
 using Server.Settings;
@@ -9,6 +11,8 @@ namespace Server.Controllers
 {
     [Route("unload")]
     [ApiController]
+    [Authorize]
+    [Authorize(AuthenticationSchemes = CookieAuthenticationDefaults.AuthenticationScheme)]
     public class UnloadController : Controller
     {
         private readonly IUnloadManager _unloadManager;

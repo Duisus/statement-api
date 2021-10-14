@@ -1,5 +1,7 @@
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Server.Repository.Interfaces;
 using Server.Managers.Interfaces;
@@ -10,6 +12,8 @@ namespace Server.Controllers
 {
     [Route("assignments")]
     [ApiController]
+    [Authorize]
+    [Authorize(AuthenticationSchemes = CookieAuthenticationDefaults.AuthenticationScheme)]
     public class AssignmentController : Controller 
     {
         private readonly IAppSettings _appSettings;

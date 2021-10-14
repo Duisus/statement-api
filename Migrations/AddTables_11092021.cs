@@ -11,6 +11,7 @@ namespace Migrations
             CreateSpecializationTable();
             CreateCourseTable();
             CreateAssignmentTable();
+            CreateUsersTable();
         }
 
         public override void Down()
@@ -19,6 +20,7 @@ namespace Migrations
             Delete.Table("Course");
             Delete.Table("Specialization");
             Delete.Table("Student");
+            Delete.Table("Users");
         }
 
         private void CreateStudentTable() 
@@ -88,6 +90,18 @@ namespace Migrations
                     .WithColumn("AttemptTimestamp").AsDateTime()
                     .WithColumn("ItemAttemptOrderNumber").AsInt64()
                     .WithColumn("CourseName").AsString();
+            }
+        }
+
+        private void CreateUsersTable()
+        {
+            if (!Schema.Table("Users").Exists())
+            {
+                Create.Table("Users")
+                    .WithColumn("Id").AsInt64().PrimaryKey().Identity()
+                    .WithColumn("Email").AsString()
+                    .WithColumn("Password").AsString()
+                    .WithColumn("Salt").AsString();
             }
         }
     }

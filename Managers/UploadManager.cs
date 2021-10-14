@@ -35,7 +35,9 @@ namespace Server.Managers
                 Serilog.Log.Error($"{tag}: File {fileName} doesn't exists");
                 return OperationResult<T>.Error($"Файла {fileName} не существует");
             }
-            var fileText = ReadFile(fileName);
+
+            var encoding = _appSettings.FileEncoding;
+            var fileText = await File.ReadAllTextAsync($"{_appSettings.Path}\\{fileName}", Encoding.GetEncoding(encoding));
             var parsingResult = await parser(fileText);
             if (!parsingResult.IsSuccess)
             {
@@ -51,17 +53,6 @@ namespace Server.Managers
             }
 
             return OperationResult<T>.Success();
-        }
-
-        private string ReadFile(string fileName)
-        {
-            using (FileStream fstream = File.OpenRead($"{_appSettings.Path}\\{fileName}"))
-            {
-                byte[] array = new byte[fstream.Length];
-                fstream.Read(array, 0, array.Length);
-                string textFromFile = System.Text.Encoding.UTF8.GetString(array);
-                return textFromFile;
-            }
         }
     }
 }

@@ -8,7 +8,8 @@
         string AssignmentFileName { get; }
         string UnloadSpecializationFileName { get; }
         string UnloadCoursesFileName { get; }
-        
+        string FileEncoding { get; }
+
         /// <summary>
         /// Куда сохранять файлы
         /// </summary>
