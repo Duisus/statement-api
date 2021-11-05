@@ -1,11 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Text.RegularExpressions;
 using System.Threading.Tasks;
-using Microsoft.VisualBasic.FileIO;
-using Serilog;
 using Server.Logic;
 using Server.Managers.Interfaces;
 using Server.Models;
@@ -33,7 +29,7 @@ namespace Server.Managers
             var result = new List<string[]>();
             foreach (string row in file.Split('\n').Skip(1))
             {
-                string[] values = row.Split(delimeter);
+                string[] values = row.Split($"\"{delimeter}\"");
                 result.Add(values);
             }
 
@@ -44,7 +40,7 @@ namespace Server.Managers
         {
             var existingStudents = await _studentRepository.GetAllAsync();
             var students = new Dictionary<string, Student>();
-            var rows = await ParseCsvFileAsync(";", file);
+            var rows = await ParseCsvFileAsync(",", file);
             foreach (var row in rows.Where(x => x.Length > 1))
             {
                 var name = row[0].Trim('\"');
@@ -86,7 +82,7 @@ namespace Server.Managers
         {
             var result = new Dictionary<string, List<Specialization>>();
             var students = await _studentRepository.GetAllAsync();
-            var rows = await ParseCsvFileAsync(";", file);
+            var rows = await ParseCsvFileAsync(",", file);
             var existingSpecializations = await _specializationRepository.GetAllAsync();
             foreach (var row in rows.Where(row=>row.Length>1))
             {
@@ -138,7 +134,7 @@ namespace Server.Managers
             var result = new Dictionary<string, List<Course>>();
             var students = await _studentRepository.GetAllAsync();
             var specializations = await _specializationRepository.GetAllAsync();
-            var rows = await ParseCsvFileAsync(";", file);
+            var rows = await ParseCsvFileAsync(",", file);
             foreach (var row in rows.Where(row=>row.Length>1))
             {
                 var name = row[0].Trim('\"');
@@ -191,7 +187,7 @@ namespace Server.Managers
 
         public async Task<OperationResult<List<Assignment>>> ParseAssignmentCsvToAssignments(string file)
         {
-            var rows = await ParseCsvFileAsync(";",file);
+            var rows = await ParseCsvFileAsync(",",file);
             var students = await _studentRepository.GetAllAsync();
             var courses = await _courseRepository.GetAllAsync();
             var assignments = await _assignmentRepository.GetAllAsync();
@@ -271,10 +267,11 @@ namespace Server.Managers
             var trimmedRow = row.ToList().Select(item => item.Trim('\"')).ToArray();   
             var attemptTimestampParsed = DateTime.TryParse(trimmedRow[13], out DateTime attemptTimestamp);
             var gradeAfterOverrideParsed = double.TryParse(trimmedRow[11].Replace('.',','), out var gradeAfterOverride);
+            var attemptGradeParsed = double.TryParse(trimmedRow[10].Replace('.', ','), out var attemptGrade);
             return new Assignment
             {
                 Title = row[8],
-                AttemptGrade = double.Parse(trimmedRow[10].Replace('.',',')),
+                AttemptGrade = attemptGradeParsed ? attemptGrade : 0,
                 AttemptTimestamp = attemptTimestampParsed ? attemptTimestamp : null,
                 GradeAfterOverride = gradeAfterOverrideParsed ? gradeAfterOverride : null,
                 IsAttemptPassed = trimmedRow[12] == "Yes",
