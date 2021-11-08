@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -19,6 +20,8 @@ namespace Server.Managers
         private readonly ISpecializationRepository _specializationRepository;
         private readonly ICourseRepository _courseRepository;
         private readonly IAssignmentRepository _assignmentRepository;
+        private readonly CultureInfo culture = CultureInfo.InvariantCulture;
+        private readonly DateTimeStyles dateTimeStyle = DateTimeStyles.None;
 
         public CsvParserManager(IStudentRepository studentRepository, ISpecializationRepository specializationRepository, ICourseRepository courseRepository, IAssignmentRepository assignmentRepository)
         {
@@ -243,11 +246,11 @@ namespace Server.Managers
 
         private Course CreateCourseWithoutStudentIdSpecId(string[] row)
         {
-            var endTimeParsed = DateTime.TryParse(row[9], out DateTime endTime);
-            var enrollmentTimeParsed = DateTime.TryParse(row[7], out DateTime enrollmentTime);
-            var startTimeParsed = DateTime.TryParse(row[8], out DateTime startTime);
-            var lastActivityTimeParsed = DateTime.TryParse(row[10], out DateTime lastActivityTime);
-            var completionTimeParsed = DateTime.TryParse(row[18], out DateTime completionTime);
+            var endTimeParsed = DateTime.TryParse(row[9], culture, dateTimeStyle, out var endTime);
+            var enrollmentTimeParsed = DateTime.TryParse(row[7], culture, dateTimeStyle, out var enrollmentTime);
+            var startTimeParsed = DateTime.TryParse(row[8], culture, dateTimeStyle, out var startTime);
+            var lastActivityTimeParsed = DateTime.TryParse(row[10], culture, dateTimeStyle, out var lastActivityTime);
+            var completionTimeParsed = DateTime.TryParse(row[18], culture, dateTimeStyle, out var completionTime);
             double.TryParse(row[19].Replace('.',','), out var grade);
             double.TryParse(row[11].Replace('.',','), out var progress);
             double.TryParse(row[12].Replace('.',','), out var hours);
@@ -270,7 +273,7 @@ namespace Server.Managers
 
         private Assignment CreateAssignmentWithoutStudentId(string[] row)
         {
-            var attemptTimestampParsed = DateTime.TryParse(row[13], out DateTime attemptTimestamp);
+            var attemptTimestampParsed = DateTime.TryParse(row[13], CultureInfo.InvariantCulture, DateTimeStyles.None,out var attemptTimestamp);
             var gradeAfterOverrideParsed = double.TryParse(row[11].Replace('.',','), out var gradeAfterOverride);
             return new Assignment
             {
