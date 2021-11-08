@@ -245,9 +245,9 @@ namespace Server.Managers
         {
             var endTimeParsed = DateTime.TryParse(row[9], out DateTime endTime);
             var enrollmentTimeParsed = DateTime.TryParse(row[7], out DateTime enrollmentTime);
-            var startTimeParsed = DateTime.TryParse(row[9], out DateTime startTime);
-            var lastActivityTimeParsed = DateTime.TryParse(row[9], out DateTime lastActivityTime);
-            var completionTimeParsed = DateTime.TryParse(row[9], out DateTime completionTime);
+            var startTimeParsed = DateTime.TryParse(row[8], out DateTime startTime);
+            var lastActivityTimeParsed = DateTime.TryParse(row[10], out DateTime lastActivityTime);
+            var completionTimeParsed = DateTime.TryParse(row[18], out DateTime completionTime);
             double.TryParse(row[19].Replace('.',','), out var grade);
             double.TryParse(row[11].Replace('.',','), out var progress);
             double.TryParse(row[12].Replace('.',','), out var hours);
