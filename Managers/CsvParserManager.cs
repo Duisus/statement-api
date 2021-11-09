@@ -273,7 +273,7 @@ namespace Server.Managers
 
         private Assignment CreateAssignmentWithoutStudentId(string[] row)
         {
-            var attemptTimestampParsed = DateTime.TryParse(row[13], CultureInfo.InvariantCulture, DateTimeStyles.None,out var attemptTimestamp);
+            var attemptTimestampParsed = DateTime.TryParse(row[13], culture, dateTimeStyle, out var attemptTimestamp);
             var gradeAfterOverrideParsed = double.TryParse(row[11].Replace('.',','), out var gradeAfterOverride);
             return new Assignment
             {
