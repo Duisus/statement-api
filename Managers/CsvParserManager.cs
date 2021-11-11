@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
 using Server.Logic;
@@ -15,6 +16,8 @@ namespace Server.Managers
         private readonly ISpecializationRepository _specializationRepository;
         private readonly ICourseRepository _courseRepository;
         private readonly IAssignmentRepository _assignmentRepository;
+        private readonly CultureInfo culture = CultureInfo.InvariantCulture;
+        private readonly DateTimeStyles dateTimeStyle = DateTimeStyles.None;
 
         public CsvParserManager(IStudentRepository studentRepository, ISpecializationRepository specializationRepository, ICourseRepository courseRepository, IAssignmentRepository assignmentRepository)
         {
@@ -27,9 +30,12 @@ namespace Server.Managers
         public Task<List<string[]>> ParseCsvFileAsync(string delimeter, string file)
         {
             var result = new List<string[]>();
-            foreach (string row in file.Split('\n').Skip(1))
+            foreach (var row in file.Split('\n').Skip(1))
             {
-                string[] values = row.Split($"\"{delimeter}\"");
+                var values = row
+                    .Split($"\"{delimeter}\"")
+                    .Select(str => str.Trim('\"'))
+                    .ToArray();
                 result.Add(values);
             }
 
@@ -43,15 +49,15 @@ namespace Server.Managers
             var rows = await ParseCsvFileAsync(",", file);
             foreach (var row in rows.Where(x => x.Length > 1))
             {
-                var name = row[0].Trim('\"');
+                var name = row[0];
                 if (existingStudents.Any(student => student.FullName == name))
                 {
                     continue;
                 }
-                var group = row[2].Trim('\"');
-                var enrolledCourses = int.Parse(row[5].Trim('\"'));
-                var completedCourses = int.Parse(row[6].Trim('\"'));
-                var memberState = row[7].Trim('\"');
+                var group = row[2];
+                var enrolledCourses = int.Parse(row[5]);
+                var completedCourses = int.Parse(row[6]);
+                var memberState = row[7];
                 if (name == "ANONYMIZED_NAME" || string.IsNullOrEmpty(name))
                 {
                     continue;
@@ -86,7 +92,7 @@ namespace Server.Managers
             var existingSpecializations = await _specializationRepository.GetAllAsync();
             foreach (var row in rows.Where(row=>row.Length>1))
             {
-                var name = row[0].Trim('\"');
+                var name = row[0];
                 if (name == "ANONYMIZED_NAME" || string.IsNullOrEmpty(name))
                 {
                     continue;
@@ -137,7 +143,7 @@ namespace Server.Managers
             var rows = await ParseCsvFileAsync(",", file);
             foreach (var row in rows.Where(row=>row.Length>1))
             {
-                var name = row[0].Trim('\"');
+                var name = row[0];
                 var course = CreateCourseWithoutStudentIdSpecId(row);
                 if (existingCourses.Any(existingCourse => existingCourse.Equals(course)))
                 {
@@ -194,7 +200,7 @@ namespace Server.Managers
             var result = new Dictionary<string, List<Assignment>>();
             foreach (var row in rows.Where(row=>row.Length>1))
             {
-                var studentName = row[3].Trim('\"');
+                var studentName = row[3];
                 var student = students.FirstOrDefault(student => student.FullName == studentName);
                 if (student is null)
                 {
@@ -226,58 +232,58 @@ namespace Server.Managers
         {
             return new Specialization
             {
-                Title = row[3].Trim('\"'),
-                CourseCount = int.TryParse(row[9].Trim('\"'), out var courseCount)? courseCount : -1,
-                CompletedCourseCount = int.TryParse(row[8].Trim('\"'), out var completedCourseCount) ? completedCourseCount : -1,
-                IsCompleted = row[10].Trim('\"') == "Yes",
-                University = row[5].Trim('\"')
+                Title = row[3],
+                CourseCount = int.TryParse(row[9], out var courseCount)? courseCount : -1,
+                CompletedCourseCount = int.TryParse(row[8], out var completedCourseCount) ? completedCourseCount : -1,
+                IsCompleted = row[10] == "Yes",
+                University = row[5]
             };
         }
 
         private Course CreateCourseWithoutStudentIdSpecId(string[] row)
         {
-            var trimmedRow = row.ToList().Select(item => item.Trim('\"')).ToArray();
-            var endTimeParsed = DateTime.TryParse(trimmedRow[9], out DateTime endTime);
-            var enrollmentTimeParsed = DateTime.TryParse(trimmedRow[7], out DateTime enrollmentTime);
-            var startTimeParsed = DateTime.TryParse(trimmedRow[9], out DateTime startTime);
-            var lastActivityTimeParsed = DateTime.TryParse(trimmedRow[9], out DateTime lastActivityTime);
-            var completionTimeParsed = DateTime.TryParse(trimmedRow[9], out DateTime completionTime);
-            double.TryParse(trimmedRow[19].Replace('.',','), out var grade);
-            double.TryParse(trimmedRow[11].Replace('.',','), out var progress);
-            double.TryParse(trimmedRow[12].Replace('.',','), out var hours);
+            var endTimeParsed = DateTime.TryParse(row[9], culture, dateTimeStyle, out var endTime);
+            var enrollmentTimeParsed = DateTime.TryParse(row[7], culture, dateTimeStyle, out var enrollmentTime);
+            var startTimeParsed = DateTime.TryParse(row[8], culture, dateTimeStyle, out var startTime);
+            var lastActivityTimeParsed = DateTime.TryParse(row[10], culture, dateTimeStyle, out var lastActivityTime);
+            var completionTimeParsed = DateTime.TryParse(row[18], culture, dateTimeStyle, out var completionTime);
+            double.TryParse(row[19].Replace('.',','), out var grade);
+            double.TryParse(row[11].Replace('.',','), out var progress);
+            double.TryParse(row[12].Replace('.',','), out var hours);
             return new Course
             {
-                Title = trimmedRow[3],
+                Title = row[3],
                 ClassEndTime = endTimeParsed ? endTime : null,
                 EnrollmentTime = enrollmentTimeParsed ? enrollmentTime : null,
                 ClassStartTime = startTimeParsed ? startTime : null,
                 LastCourseActivityTime = lastActivityTimeParsed ? lastActivityTime : null,
                 CompletionTime = completionTimeParsed ? completionTime : null,
                 Grade = grade,
-                IsCompleted = trimmedRow[13] == "Yes",
+                IsCompleted = row[13] == "Yes",
                 Progress = progress,
-                CertificateUrl = trimmedRow[20],
+                CertificateUrl = row[20],
                 LearningHours = hours,
-                University = trimmedRow[6]
+                University = row[6]
             };
         }
 
         private Assignment CreateAssignmentWithoutStudentId(string[] row)
         {
-            var trimmedRow = row.ToList().Select(item => item.Trim('\"')).ToArray();   
-            var attemptTimestampParsed = DateTime.TryParse(trimmedRow[13], out DateTime attemptTimestamp);
-            var gradeAfterOverrideParsed = double.TryParse(trimmedRow[11].Replace('.',','), out var gradeAfterOverride);
-            var attemptGradeParsed = double.TryParse(trimmedRow[10].Replace('.', ','), out var attemptGrade);
+            var attemptTimestampParsed = TryParseDate(row[13], out var attemptTimestamp);
+
+            var attemptGradeParsed = TryParseDouble(row[10], out var attemptGrade);
+            var gradeAfterOverrideParsed = TryParseDouble(row[11], out var gradeAfterOverride);
+
             return new Assignment
             {
                 Title = row[8],
-                AttemptGrade = attemptGradeParsed ? attemptGrade : 0,
+                AttemptGrade = attemptGradeParsed ? attemptGrade : null,
                 AttemptTimestamp = attemptTimestampParsed ? attemptTimestamp : null,
                 GradeAfterOverride = gradeAfterOverrideParsed ? gradeAfterOverride : null,
-                IsAttemptPassed = trimmedRow[12] == "Yes",
-                ItemAttemptOrderNumber = int.Parse(trimmedRow[14]),
-                Order = int.Parse(trimmedRow[9]),
-                CourseName = trimmedRow[5]
+                IsAttemptPassed = row[12] == "Yes",
+                ItemAttemptOrderNumber = int.Parse(row[14]),
+                Order = int.Parse(row[9]),
+                CourseName = row[5]
             };
         }
     }
