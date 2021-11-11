@@ -2,11 +2,7 @@
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
-using System.Text;
-using System.Text.RegularExpressions;
 using System.Threading.Tasks;
-using Microsoft.VisualBasic.FileIO;
-using Serilog;
 using Server.Logic;
 using Server.Managers.Interfaces;
 using Server.Models;
@@ -34,9 +30,9 @@ namespace Server.Managers
         public Task<List<string[]>> ParseCsvFileAsync(string delimeter, string file)
         {
             var result = new List<string[]>();
-            foreach (string row in file.Split('\n').Skip(1))
+            foreach (var row in file.Split('\n').Skip(1))
             {
-                string[] values = row
+                var values = row
                     .Split($"\"{delimeter}\"")
                     .Select(str => str.Trim('\"'))
                     .ToArray();
@@ -273,12 +269,15 @@ namespace Server.Managers
 
         private Assignment CreateAssignmentWithoutStudentId(string[] row)
         {
-            var attemptTimestampParsed = DateTime.TryParse(row[13], culture, dateTimeStyle, out var attemptTimestamp);
-            var gradeAfterOverrideParsed = double.TryParse(row[11].Replace('.',','), out var gradeAfterOverride);
+            var attemptTimestampParsed = TryParseDate(row[13], out var attemptTimestamp);
+
+            var attemptGradeParsed = TryParseDouble(row[10], out var attemptGrade);
+            var gradeAfterOverrideParsed = TryParseDouble(row[11], out var gradeAfterOverride);
+
             return new Assignment
             {
                 Title = row[8],
-                AttemptGrade = double.Parse(row[10].Replace('.',',')),
+                AttemptGrade = attemptGradeParsed ? attemptGrade : null,
                 AttemptTimestamp = attemptTimestampParsed ? attemptTimestamp : null,
                 GradeAfterOverride = gradeAfterOverrideParsed ? gradeAfterOverride : null,
                 IsAttemptPassed = row[12] == "Yes",

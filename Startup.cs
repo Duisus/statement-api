@@ -39,7 +39,7 @@ namespace Server
              services
                 .AddFluentMigratorCore()
                 .ConfigureRunner(rb => rb
-                    .AddSqlServer()
+                    .AddMySql5()
                     .WithGlobalConnectionString(Configuration.GetValue<string>("ConnectionString"))
                     .ScanIn(Assembly.GetExecutingAssembly()).For.All())
                 .AddLogging(lb => lb.AddFluentMigratorConsole());

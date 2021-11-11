@@ -87,7 +87,7 @@ namespace Migrations
                     .WithColumn("AttemptGrade").AsFloat()
                     .WithColumn("GradeAfterOverride").AsFloat().Nullable()
                     .WithColumn("IsAttemptPassed").AsBoolean()
-                    .WithColumn("AttemptTimestamp").AsDateTime()
+                    .WithColumn("AttemptTimestamp").AsDateTime().Nullable()
                     .WithColumn("ItemAttemptOrderNumber").AsInt64()
                     .WithColumn("CourseName").AsString();
             }

@@ -2,7 +2,7 @@ using Dapper.Contrib.Extensions;
 
 namespace Server.Models 
 {
-    [Table("[Student]")]
+    [Table("Student")]
     public class Student 
     {
         public int Id { get; set; }

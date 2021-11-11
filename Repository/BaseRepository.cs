@@ -4,8 +4,8 @@ using System.Linq;
 using System.Threading.Tasks;
 using Dapper;
 using Dapper.Contrib.Extensions;
-using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Configuration;
+using MySql.Data.MySqlClient;
 using Server.Logic;
 using Server.Repository.Interfaces;
 
@@ -22,7 +22,7 @@ namespace Server.Repository
 
         public async Task<OperationResult<T>> GetAsync(int id)
         {
-            await using var connection = new SqlConnection(_dbConnection);
+            await using var connection = new MySqlConnection(_dbConnection);
             var result = await connection.GetAsync<T>(id);
             if (result is not null)
             {
@@ -34,20 +34,21 @@ namespace Server.Repository
 
         public async Task<long> AddAsync(T item)
         {
-            await using var connection = new SqlConnection(_dbConnection);
+            await using var connection = new MySqlConnection(_dbConnection);
             var addResult = await connection.InsertAsync(item);
             return addResult;
         }
 
         public async Task<OperationResult> AddMultipleAsync(IEnumerable<T> items)
         {
-            await using var connection = new SqlConnection(_dbConnection);
+            await using var connection = new MySqlConnection(_dbConnection);
             var propNames = typeof(T)
                 .GetProperties()
-                .Where(prop => prop.Name != "Id")
+                // Не уверен, что это правильное решение
+                //.Where(prop => prop.Name != "Id")
                 .Select(prop => $"@{prop.Name}");
 
-            var sql = $"INSERT INTO [{typeof(T).Name}] VALUES ({string.Join(',',propNames)}) ";
+            var sql = $"INSERT INTO {typeof(T).Name} VALUES ({string.Join(',',propNames)}) ";
             foreach (var item in items)
             {
                 try
@@ -66,7 +67,7 @@ namespace Server.Repository
 
         public async Task<List<T>> GetByStudentIdColumnAsync(int studentId)
         {
-            await using var connection = new SqlConnection(_dbConnection);
+            await using var connection = new MySqlConnection(_dbConnection);
             var sql = $"SELECT * FROM {typeof(T).Name} WHERE StudentId = {studentId}";
             var result = await connection.QueryAsync<T>(sql);
             return result.ToList();
@@ -74,15 +75,15 @@ namespace Server.Repository
 
         public async Task<bool> UpdateAsync(T item)
         {
-            await using var connection = new SqlConnection(_dbConnection);
+            await using var connection = new MySqlConnection(_dbConnection);
             var result = await connection.UpdateAsync(item);
             return result;
         }
 
         public async Task<List<T>> GetAllAsync()
         {
-            var sql = $"SELECT * FROM [{typeof(T).Name}]";
-            await using var connection = new SqlConnection(_dbConnection);
+            var sql = $"SELECT * FROM {typeof(T).Name}";
+            await using var connection = new MySqlConnection(_dbConnection);
             var items = await connection.QueryAsync<T>(sql);
             return items.ToList();
         }

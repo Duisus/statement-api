@@ -2,7 +2,7 @@
 
 namespace Server.Models
 {
-    [Table("[FileModel]")]
+    [Table("FileModel")]
     public class FileModel
     {
         [Key]
