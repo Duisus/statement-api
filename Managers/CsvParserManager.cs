@@ -16,8 +16,6 @@ namespace Server.Managers
         private readonly ISpecializationRepository _specializationRepository;
         private readonly ICourseRepository _courseRepository;
         private readonly IAssignmentRepository _assignmentRepository;
-        private readonly CultureInfo culture = CultureInfo.InvariantCulture;
-        private readonly DateTimeStyles dateTimeStyle = DateTimeStyles.None;
 
         public CsvParserManager(IStudentRepository studentRepository, ISpecializationRepository specializationRepository, ICourseRepository courseRepository, IAssignmentRepository assignmentRepository)
         {
@@ -233,7 +231,7 @@ namespace Server.Managers
             return new Specialization
             {
                 Title = row[3],
-                CourseCount = int.TryParse(row[9], out var courseCount)? courseCount : -1,
+                CourseCount = int.TryParse(row[9], out var courseCount) ? courseCount : -1,
                 CompletedCourseCount = int.TryParse(row[8], out var completedCourseCount) ? completedCourseCount : -1,
                 IsCompleted = row[10] == "Yes",
                 University = row[5]
@@ -242,14 +240,16 @@ namespace Server.Managers
 
         private Course CreateCourseWithoutStudentIdSpecId(string[] row)
         {
-            var endTimeParsed = DateTime.TryParse(row[9], culture, dateTimeStyle, out var endTime);
-            var enrollmentTimeParsed = DateTime.TryParse(row[7], culture, dateTimeStyle, out var enrollmentTime);
-            var startTimeParsed = DateTime.TryParse(row[8], culture, dateTimeStyle, out var startTime);
-            var lastActivityTimeParsed = DateTime.TryParse(row[10], culture, dateTimeStyle, out var lastActivityTime);
-            var completionTimeParsed = DateTime.TryParse(row[18], culture, dateTimeStyle, out var completionTime);
-            double.TryParse(row[19].Replace('.',','), out var grade);
-            double.TryParse(row[11].Replace('.',','), out var progress);
-            double.TryParse(row[12].Replace('.',','), out var hours);
+            var endTimeParsed = TryParseDate(row[9], out var endTime);
+            var enrollmentTimeParsed = TryParseDate(row[7], out var enrollmentTime);
+            var startTimeParsed = TryParseDate(row[8], out var startTime);
+            var lastActivityTimeParsed = TryParseDate(row[10], out var lastActivityTime);
+            var completionTimeParsed = TryParseDate(row[18], out var completionTime);
+
+            TryParseDouble(row[19], out var grade);
+            TryParseDouble(row[11], out var progress);
+            TryParseDouble(row[12], out var hours);
+
             return new Course
             {
                 Title = row[3],
@@ -286,5 +286,11 @@ namespace Server.Managers
                 CourseName = row[5]
             };
         }
+
+        private static bool TryParseDate(string value, out DateTime result) =>
+            DateTime.TryParse(value, CultureInfo.InvariantCulture, DateTimeStyles.None, out result);
+        
+        private static bool TryParseDouble(string value, out double result) =>
+            double.TryParse(value, NumberStyles.Float, CultureInfo.InvariantCulture, out result);
     }
 }
