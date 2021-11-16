@@ -12,7 +12,7 @@ namespace server.Dto.ModelDto
         public int Order { get; set; }
 
         [JsonProperty("attemptGrade")]
-        public double AttemptGrade { get; set; }
+        public double? AttemptGrade { get; set; }
 
         [JsonProperty("gradeAfterOverride")]
         public double? GradeAfterOverride { get; set; }
