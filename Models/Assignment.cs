@@ -14,7 +14,7 @@ namespace Server.Models
 
         public int Order { get; set; }
 
-        public double AttemptGrade { get; set; }
+        public double? AttemptGrade { get; set; }
 
         public double? GradeAfterOverride { get; set; }
 
@@ -50,9 +50,8 @@ namespace Server.Models
                    && assignment.StudentId == StudentId
                    && assignment.Title == Title
                    && assignment.Order == Order
-                   && Math.Abs(assignment.AttemptGrade - AttemptGrade) < 0.5
-                   && ((!assignment.GradeAfterOverride.HasValue && !GradeAfterOverride.HasValue) ||
-                       Math.Abs(assignment.GradeAfterOverride.Value - GradeAfterOverride.Value) < 0.5)
+                   && Equals(assignment.AttemptGrade, AttemptGrade)
+                   && Equals(assignment.GradeAfterOverride, GradeAfterOverride)
                    && assignment.IsAttemptPassed == IsAttemptPassed
                    && assignment.ItemAttemptOrderNumber == ItemAttemptOrderNumber
                    && assignment.CourseName == CourseName;
