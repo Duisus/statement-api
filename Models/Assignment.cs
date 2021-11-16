@@ -50,11 +50,21 @@ namespace Server.Models
                    && assignment.StudentId == StudentId
                    && assignment.Title == Title
                    && assignment.Order == Order
-                   && Equals(assignment.AttemptGrade, AttemptGrade)
-                   && Equals(assignment.GradeAfterOverride, GradeAfterOverride)
+                   && DoubleEquals(assignment.AttemptGrade, AttemptGrade)
+                   && DoubleEquals(assignment.GradeAfterOverride, GradeAfterOverride)
                    && assignment.IsAttemptPassed == IsAttemptPassed
                    && assignment.ItemAttemptOrderNumber == ItemAttemptOrderNumber
                    && assignment.CourseName == CourseName;
+        }
+
+        private static bool DoubleEquals(double? first, double? second)
+        {
+            if (!first.HasValue && !second.HasValue)
+                return true;
+            if (first.HasValue != second.HasValue)
+                return false;
+
+            return Math.Abs(first.Value - second.Value) < 0.5;
         }
     }
 }
