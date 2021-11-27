@@ -84,7 +84,7 @@ namespace Migrations
                     .WithColumn("StudentId").AsInt64().ForeignKey("Student", "Id")
                     .WithColumn("Title").AsString()
                     .WithColumn("Order").AsInt64()
-                    .WithColumn("AttemptGrade").AsFloat()
+                    .WithColumn("AttemptGrade").AsFloat().Nullable()
                     .WithColumn("GradeAfterOverride").AsFloat().Nullable()
                     .WithColumn("IsAttemptPassed").AsBoolean()
                     .WithColumn("AttemptTimestamp").AsDateTime().Nullable()
