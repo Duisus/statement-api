@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
@@ -90,7 +91,7 @@ namespace Server.Managers
                     cell = sheet.Cells[row, column];
                     if (course is not null)
                     {
-                        cell.PutValue(course.IsCompleted ? 100 : 0);
+                        cell.PutValue(Math.Round(course.Grade, 2));
                     }
                     else
                     {
@@ -132,7 +133,7 @@ namespace Server.Managers
                     row += 1;
                     column = 0;
                     sheet.Cells[row,column].PutValue(student.Data.FullName);
-                    sheet.Cells[row, column + 1].PutValue(course.IsCompleted ? 100 : 0);
+                    sheet.Cells[row, column + 1].PutValue(Math.Round(course.Grade, 2));
                 }
 
                 row += 2;
