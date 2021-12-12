@@ -42,7 +42,7 @@ namespace Server.Managers
             if (!parsingResult.IsSuccess)
             {
                 Serilog.Log.Error($"{tag}: An error occured while parsing csv");
-                return OperationResult<T>.Error("Не удалось получить данные из файла");
+                return OperationResult<T>.Error($"Не удалось получить данные из файла {fileName}");
             }
 
             var addResult = await repo.AddMultipleAsync(parsingResult.Data);
