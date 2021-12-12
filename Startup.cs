@@ -69,7 +69,8 @@ namespace Server
                 .AddTransient<ICsvParserManager, CsvParserManager>()
                 .AddTransient<IUploadManager, UploadManager>()
                 .AddTransient<IDataManager, DataManager>()
-                .AddTransient<IUnloadManager, UnloadManager>();
+                .AddTransient<IUnloadManager, UnloadManager>()
+                .AddTransient<IUpdateManager, UpdateManager>();
             
             //Настройки
             services
