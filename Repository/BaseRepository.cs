@@ -87,5 +87,14 @@ namespace Server.Repository
             var items = await connection.QueryAsync<T>(sql);
             return items.ToList();
         }
+
+        public async Task TruncateAsync()
+        {
+            await using var connection = new MySqlConnection(_dbConnection);
+            var sql = "SET FOREIGN_KEY_CHECKS=0;" + 
+                      $"TRUNCATE TABLE {typeof(T).Name};" + 
+                      "set FOREIGN_KEY_CHECKS=1;";
+            await connection.QueryAsync(sql);
+        }
     }
 }

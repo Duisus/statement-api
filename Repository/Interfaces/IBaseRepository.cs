@@ -26,5 +26,7 @@ namespace Server.Repository.Interfaces
         public Task<List<T>> GetByStudentIdColumnAsync(int studentId);
 
         public Task<bool> UpdateAsync(T item);
+
+        public Task TruncateAsync();
     }
 }
