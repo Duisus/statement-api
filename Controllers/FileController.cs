@@ -8,23 +8,31 @@ using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Server.Logic;
+using server.Managers.Interfaces;
 using Server.Models;
 using Server.Repository.Interfaces;
 using Server.Settings;
+using server.Validators;
 
 namespace Server.Controllers
 {
     [Route("files")]
     [ApiController]
-    [Authorize]
-    [Authorize(AuthenticationSchemes = CookieAuthenticationDefaults.AuthenticationScheme)]
+    // [Authorize]
+    //[Authorize(AuthenticationSchemes = CookieAuthenticationDefaults.AuthenticationScheme)]
     public class FileController : Controller
     {
         private readonly IFileRepository _fileRepository;
+        private readonly IFileUpdater _fileUpdater;
+        private readonly IFileValidator _fileValidator;
         private readonly IAppSettings _appSettings;
-        public FileController(IFileRepository fileRepository, IAppSettings appSettings)
+
+        public FileController(IFileRepository fileRepository,IFileUpdater fileUpdater,IFileValidator fileValidator, IAppSettings appSettings)
         {
             _fileRepository = fileRepository;
+            _fileUpdater = fileUpdater;
+            _fileValidator = fileValidator;
             _appSettings = appSettings;
         }
         
@@ -50,7 +58,7 @@ namespace Server.Controllers
             await uploadedFile.CopyToAsync(fileStream);
             await fileStream.DisposeAsync();
             
-            var newFile = new FileModel()
+            var newFile = new FileModel
             {
                 FileName = uploadedFile.FileName,
             };
@@ -87,6 +95,22 @@ namespace Server.Controllers
                 return Ok(result);
             }
             return NotFound();
+        }
+
+        [HttpPost("uploadNew")]
+        public async Task<OperationResult> UploadNewData(
+            [FromForm(Name = "students")] IFormFile students,
+            [FromForm(Name = "specializations")] IFormFile specializations,
+            [FromForm(Name = "courses")] IFormFile courses,
+            [FromForm(Name = "assignments")] IFormFile assignments)
+        {
+            var isValid = _fileValidator.IsValid(students, specializations, courses, assignments);
+
+            if (!isValid.IsSuccess)
+                return isValid;
+
+            await _fileUpdater.Update(students, specializations, courses, assignments);
+            return OperationResult.Success();
         }
     }
 }

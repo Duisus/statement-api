@@ -87,5 +87,11 @@ namespace Server.Repository
             var items = await connection.QueryAsync<T>(sql);
             return items.ToList();
         }
+
+        public async Task Clear()
+        {
+            await using var connection = new MySqlConnection(_dbConnection);
+            await connection.DeleteAllAsync<T>();
+        }
     }
 }
