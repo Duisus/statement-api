@@ -19,8 +19,8 @@ namespace Server.Controllers
 {
     [Route("files")]
     [ApiController]
-    // [Authorize]
-    //[Authorize(AuthenticationSchemes = CookieAuthenticationDefaults.AuthenticationScheme)]
+    [Authorize]
+    [Authorize(AuthenticationSchemes = CookieAuthenticationDefaults.AuthenticationScheme)]
     public class FileController : Controller
     {
         private readonly IFileRepository _fileRepository;
