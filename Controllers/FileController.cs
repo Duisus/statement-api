@@ -109,8 +109,7 @@ namespace Server.Controllers
             if (!isValid.IsSuccess)
                 return isValid;
 
-            await _fileUpdater.Update(students, specializations, courses, assignments);
-            return OperationResult.Success();
+            return await _fileUpdater.Update(students, specializations, courses, assignments);
         }
     }
 }
