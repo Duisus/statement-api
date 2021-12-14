@@ -27,6 +27,6 @@ namespace Server.Repository.Interfaces
 
         public Task<bool> UpdateAsync(T item);
 
-        public Task TruncateAsync();
+        public Task Clear();
     }
 }

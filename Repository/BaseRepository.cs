@@ -88,13 +88,10 @@ namespace Server.Repository
             return items.ToList();
         }
 
-        public async Task TruncateAsync()
+        public async Task Clear()
         {
             await using var connection = new MySqlConnection(_dbConnection);
-            var sql = "SET FOREIGN_KEY_CHECKS=0;" + 
-                      $"TRUNCATE TABLE {typeof(T).Name};" + 
-                      "set FOREIGN_KEY_CHECKS=1;";
-            await connection.QueryAsync(sql);
+            await connection.DeleteAllAsync<T>();
         }
     }
 }

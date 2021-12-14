@@ -105,10 +105,10 @@ namespace Server.Managers
 
         private async Task TruncateAllTables()
         {
-            await _studentRepository.TruncateAsync();
-            await _specializationRepository.TruncateAsync();
-            await _courseRepository.TruncateAsync();
-            await _assignmentRepository.TruncateAsync();
+            await _studentRepository.Clear();
+            await _specializationRepository.Clear();
+            await _courseRepository.Clear();
+            await _assignmentRepository.Clear();
         }
     }
 }
