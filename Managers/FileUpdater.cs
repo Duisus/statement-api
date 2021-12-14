@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Http;
 using Serilog;
 using Server.Logic;
 using server.Managers.Interfaces;
+using Server.Managers.Interfaces;
 using Server.Repository.Interfaces;
 using Server.Settings;
 
@@ -14,11 +15,13 @@ namespace server.Managers
     {
         private readonly IAppSettings appSettings;
         private readonly IFileRepository fileRepository;
+        private readonly IUpdateManager updateManager;
 
-        public FileUpdater(IAppSettings appSettings, IFileRepository fileRepository)
+        public FileUpdater(IAppSettings appSettings, IFileRepository fileRepository, IUpdateManager updateManager)
         {
             this.appSettings = appSettings;
             this.fileRepository = fileRepository;
+            this.updateManager = updateManager;
         }
 
         public async Task<OperationResult> Update(IFormFile students, IFormFile specialization, IFormFile course, IFormFile assignmetns)
@@ -40,9 +43,7 @@ namespace server.Managers
 
             await Task.WhenAll(RewriteAll(students, specialization, course, assignmetns));
 
-            //return IUpdateManager.Update();
-
-            return OperationResult.Success();
+            return await updateManager.UpdateAsync();
         }
 
         private async Task<OperationResult> AddAllFileName(params string[] fileNames)
