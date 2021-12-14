@@ -30,163 +30,191 @@ namespace Server.Managers
 
         public async Task<OperationResult<List<Student>>> ParseStudentsCsvToStudents(string file)
         {
-            var existingStudents = await _studentRepository.GetAllAsync();
-            var students = new Dictionary<string, Student>();
-            var rows = await ParseCsvFileAsync(",", file);
-            foreach (var row in rows.Where(x => x.Length > 1))
+            try
             {
-                var name = row[0];
-                if (existingStudents.Any(student => student.FullName == name)) continue;
-                var group = row[2];
-                var enrolledCourses = int.Parse(row[5]);
-                var completedCourses = int.Parse(row[6]);
-                var memberState = row[7];
-                if (name == "ANONYMIZED_NAME" || string.IsNullOrEmpty(name)) continue;
-                var student = new Student
+                var existingStudents = await _studentRepository.GetAllAsync();
+                var students = new Dictionary<string, Student>();
+                var rows = await ParseCsvFileAsync(",", file);
+                foreach (var row in rows.Where(x => x.Length > 1))
                 {
-                    FullName = name,
-                    Group = group,
-                    EnrolledCourses = enrolledCourses,
-                    CompletedCourses = completedCourses,
-                    MemberState = memberState
-                };
+                    var name = row[0];
+                    if (existingStudents.Any(student => student.FullName == name)) continue;
+                    var group = row[2];
+                    var enrolledCourses = int.Parse(row[5]);
+                    var completedCourses = int.Parse(row[6]);
+                    var memberState = row[7];
+                    if (name == "ANONYMIZED_NAME" || string.IsNullOrEmpty(name)) continue;
+                    var student = new Student
+                    {
+                        FullName = name,
+                        Group = group,
+                        EnrolledCourses = enrolledCourses,
+                        CompletedCourses = completedCourses,
+                        MemberState = memberState
+                    };
 
-                if (!students.ContainsKey(name))
-                    students.Add(name, student);
-                else
-                    students[row[0]] = student;
+                    if (!students.ContainsKey(name))
+                        students.Add(name, student);
+                    else
+                        students[row[0]] = student;
+                }
+
+                var result = students.Values.GroupBy(stud => stud.FullName).Select(stud => stud.First()).ToList();
+                return OperationResult<List<Student>>.Success(result);
             }
-
-            var result = students.Values.GroupBy(stud => stud.FullName).Select(stud => stud.First()).ToList();
-            return OperationResult<List<Student>>.Success(result);
+            catch (Exception e)
+            {
+                return OperationResult<List<Student>>.Error(e.Message);
+            }
         }
 
         public async Task<OperationResult<List<Specialization>>> ParseSpecializationCsvToSpecializations(string file)
         {
-            var result = new Dictionary<string, List<Specialization>>();
-            var students = await _studentRepository.GetAllAsync();
-            var rows = await ParseCsvFileAsync(",", file);
-            var existingSpecializations = await _specializationRepository.GetAllAsync();
-            foreach (var row in rows.Where(row => row.Length > 1))
+            try
             {
-                var name = row[0];
-                if (name == "ANONYMIZED_NAME" || string.IsNullOrEmpty(name)) continue;
-                if (result.ContainsKey(name))
+                var result = new Dictionary<string, List<Specialization>>();
+                var students = await _studentRepository.GetAllAsync();
+                var rows = await ParseCsvFileAsync(",", file);
+                var existingSpecializations = await _specializationRepository.GetAllAsync();
+                foreach (var row in rows.Where(row => row.Length > 1))
                 {
-                    var specialization = CreateSpecializationWithoutStudentId(row);
-                    specialization.StudentId = result[name][0].StudentId;
-                    if (existingSpecializations.Any(existingSpecialization =>
-                        existingSpecialization.Equals(specialization)))
-                        continue;
-                    result[name].Add(specialization);
-                }
-                else
-                {
-                    var student = students.FirstOrDefault(student => student.FullName == name);
-                    if (student == null)
+                    var name = row[0];
+                    if (name == "ANONYMIZED_NAME" || string.IsNullOrEmpty(name)) continue;
+                    if (result.ContainsKey(name))
                     {
-                        Log.Warning($"There is no student {name}. Skipping");
-                        continue;
+                        var specialization = CreateSpecializationWithoutStudentId(row);
+                        specialization.StudentId = result[name][0].StudentId;
+                        if (existingSpecializations.Any(existingSpecialization =>
+                            existingSpecialization.Equals(specialization)))
+                            continue;
+                        result[name].Add(specialization);
                     }
-
-                    var specialization = CreateSpecializationWithoutStudentId(row);
-                    specialization.StudentId = student.Id;
-                    if (existingSpecializations.Any(existingSpecialization =>
-                        existingSpecialization.Equals(specialization)))
-                        continue;
-                    result.Add(name, new List<Specialization>
+                    else
                     {
-                        specialization
-                    });
-                }
-            }
+                        var student = students.FirstOrDefault(student => student.FullName == name);
+                        if (student == null)
+                        {
+                            Log.Warning($"There is no student {name}. Skipping");
+                            continue;
+                        }
 
-            var res = result.Values.SelectMany(specs => specs).ToList();
-            return OperationResult<List<Specialization>>.Success(res);
+                        var specialization = CreateSpecializationWithoutStudentId(row);
+                        specialization.StudentId = student.Id;
+                        if (existingSpecializations.Any(existingSpecialization =>
+                            existingSpecialization.Equals(specialization)))
+                            continue;
+                        result.Add(name, new List<Specialization>
+                        {
+                            specialization
+                        });
+                    }
+                }
+
+                var res = result.Values.SelectMany(specs => specs).ToList();
+                return OperationResult<List<Specialization>>.Success(res);
+            }
+            catch (Exception e)
+            {
+                return OperationResult<List<Specialization>>.Error(e.Message);
+            }
         }
 
         public async Task<OperationResult<List<Course>>> ParseCourseCsvToSpecializations(string file)
         {
-            var existingCourses = await _courseRepository.GetAllAsync();
-            var result = new Dictionary<string, List<Course>>();
-            var students = await _studentRepository.GetAllAsync();
-            var specializations = await _specializationRepository.GetAllAsync();
-            var rows = await ParseCsvFileAsync(",", file);
-            foreach (var row in rows.Where(row => row.Length > 1))
+            try
             {
-                var name = row[0];
-                var course = CreateCourseWithoutStudentIdSpecId(row);
-                if (existingCourses.Any(existingCourse => existingCourse.Equals(course))) continue;
-                if (result.ContainsKey(name))
+                var existingCourses = await _courseRepository.GetAllAsync();
+                var result = new Dictionary<string, List<Course>>();
+                var students = await _studentRepository.GetAllAsync();
+                var specializations = await _specializationRepository.GetAllAsync();
+                var rows = await ParseCsvFileAsync(",", file);
+                foreach (var row in rows.Where(row => row.Length > 1))
                 {
-                    course.StudentId = result[name][0].StudentId;
-
-                    var specialization = specializations.FirstOrDefault(spec =>
-                        spec.University == course.University && spec.StudentId == course.StudentId);
-
-                    if (specialization != null)
-                        course.SpecializationId = specialization.Id;
-
-                    result[name].Add(course);
-                }
-                else
-                {
-                    var student = students.FirstOrDefault(student => student.FullName == name);
-                    if (student == null)
+                    var name = row[0];
+                    var course = CreateCourseWithoutStudentIdSpecId(row);
+                    if (existingCourses.Any(existingCourse => existingCourse.Equals(course))) continue;
+                    if (result.ContainsKey(name))
                     {
-                        Log.Warning($"There was no student with name {name} db. Skipping this course");
-                        continue;
-                    }
+                        course.StudentId = result[name][0].StudentId;
 
-                    var specialization = specializations.FirstOrDefault(spec =>
-                        spec.University == course.University && spec.StudentId == student.Id);
+                        var specialization = specializations.FirstOrDefault(spec =>
+                            spec.University == course.University && spec.StudentId == course.StudentId);
 
-                    course.StudentId = student.Id;
-                    if (specialization == null)
-                    {
-                        result.Add(name, new List<Course> { course });
+                        if (specialization != null)
+                            course.SpecializationId = specialization.Id;
+
+                        result[name].Add(course);
                     }
                     else
                     {
-                        course.SpecializationId = specialization.Id;
-                        result.Add(name, new List<Course> { course });
+                        var student = students.FirstOrDefault(student => student.FullName == name);
+                        if (student == null)
+                        {
+                            Log.Warning($"There was no student with name {name} db. Skipping this course");
+                            continue;
+                        }
+
+                        var specialization = specializations.FirstOrDefault(spec =>
+                            spec.University == course.University && spec.StudentId == student.Id);
+
+                        course.StudentId = student.Id;
+                        if (specialization == null)
+                        {
+                            result.Add(name, new List<Course> { course });
+                        }
+                        else
+                        {
+                            course.SpecializationId = specialization.Id;
+                            result.Add(name, new List<Course> { course });
+                        }
                     }
                 }
-            }
 
-            var res = result.SelectMany(courses => courses.Value).ToList();
-            return OperationResult<List<Course>>.Success(res);
+                var res = result.SelectMany(courses => courses.Value).ToList();
+                return OperationResult<List<Course>>.Success(res);
+            }
+            catch (Exception e)
+            {
+                return OperationResult<List<Course>>.Error(e.Message);
+            }
         }
 
         public async Task<OperationResult<List<Assignment>>> ParseAssignmentCsvToAssignments(string file)
         {
-            var rows = await ParseCsvFileAsync(",", file);
-            var students = await _studentRepository.GetAllAsync();
-            var courses = await _courseRepository.GetAllAsync();
-            var assignments = await _assignmentRepository.GetAllAsync();
-            var result = new Dictionary<string, List<Assignment>>();
-            foreach (var row in rows.Where(row => row.Length > 1))
+            try
             {
-                var studentName = row[3];
-                var student = students.FirstOrDefault(student => student.FullName == studentName);
-                if (student is null)
+                var rows = await ParseCsvFileAsync(",", file);
+                var students = await _studentRepository.GetAllAsync();
+                var courses = await _courseRepository.GetAllAsync();
+                var assignments = await _assignmentRepository.GetAllAsync();
+                var result = new Dictionary<string, List<Assignment>>();
+                foreach (var row in rows.Where(row => row.Length > 1))
                 {
-                    Log.Warning($"There was no student with name {studentName}. Skipping this assignment");
-                    continue;
+                    var studentName = row[3];
+                    var student = students.FirstOrDefault(student => student.FullName == studentName);
+                    if (student is null)
+                    {
+                        Log.Warning($"There was no student with name {studentName}. Skipping this assignment");
+                        continue;
+                    }
+
+                    var assignment = CreateAssignmentWithoutStudentId(row);
+                    assignment.StudentId = student.Id;
+                    if (assignments.Exists(assignm => assignm.Equals(assignment))) continue;
+                    if (result.ContainsKey(studentName))
+                        result[studentName].Add(assignment);
+                    else
+                        result[studentName] = new List<Assignment> { assignment };
                 }
 
-                var assignment = CreateAssignmentWithoutStudentId(row);
-                assignment.StudentId = student.Id;
-                if (assignments.Exists(assignm => assignm.Equals(assignment))) continue;
-                if (result.ContainsKey(studentName))
-                    result[studentName].Add(assignment);
-                else
-                    result[studentName] = new List<Assignment> { assignment };
+                var res = result.Values.SelectMany(value => value).ToList();
+
+                return OperationResult<List<Assignment>>.Success(res);
             }
-
-            var res = result.Values.SelectMany(value => value).ToList();
-
-            return OperationResult<List<Assignment>>.Success(res);
+            catch (Exception e)
+            {
+                return OperationResult<List<Assignment>>.Error(e.Message);
+            }
         }
 
         public Task<List<string[]>> ParseCsvFileAsync(string delimeter, string file)
