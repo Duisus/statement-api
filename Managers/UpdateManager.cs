@@ -1,4 +1,7 @@
-﻿using System.Threading.Tasks;
+﻿using System;
+using System.Collections.Generic;
+using System.Threading.Tasks;
+using Org.BouncyCastle.Tsp;
 using Server.Logic;
 using Server.Managers.Interfaces;
 using Server.Repository.Interfaces;
@@ -36,7 +39,16 @@ namespace Server.Managers
         
         public async Task<OperationResult> UpdateAsync()
         {
-            await TruncateAllTables();
+            var tag = $"{GetType()}.{nameof(UpdateAsync)}";
+            try
+            {
+                await ClearAllTables();
+            }
+            catch (Exception e)
+            {
+                Serilog.Log.Error($"{tag}: An error occured while clearing tables with message: {e.Message}");
+                return OperationResult.Error("Произошла ошибка при удалении данных");
+            }
             
             var uploadResult = await UploadUntilErrorAsync();
             return uploadResult;
@@ -44,66 +56,52 @@ namespace Server.Managers
 
         private async Task<OperationResult> UploadUntilErrorAsync()
         {
-            var operationResult = await AddStudents();
+            var operationResult = await AddFromFile(
+                _appSettings.StudentsFileName,
+                _studentRepository,
+                _csvParserManager.ParseStudentsCsvToStudents);
             if (!operationResult.IsSuccess)
                 return operationResult;
 
-            operationResult = await AddSpecializations();
+            operationResult = await AddFromFile(
+                _appSettings.SpecializationsFileName,
+                _specializationRepository,
+                _csvParserManager.ParseSpecializationCsvToSpecializations);
             if (!operationResult.IsSuccess)
                 return operationResult;
 
-            operationResult = await AddCourses();
+            operationResult = await AddFromFile(
+                _appSettings.CoursesFileName,
+                _courseRepository,
+                _csvParserManager.ParseCourseCsvToSpecializations);
             if (!operationResult.IsSuccess)
                 return operationResult;
 
-            operationResult = await AddAssignments();
+            operationResult = await AddFromFile(
+                _appSettings.AssignmentFileName,
+                _assignmentRepository,
+                _csvParserManager.ParseAssignmentCsvToAssignments);
             if (!operationResult.IsSuccess)
                 return operationResult;
             
             return OperationResult.Success();
         }
 
-        private async Task<OperationResult> AddStudents()
+        private async Task<OperationResult> AddFromFile<T>(
+            string fileName,
+            IBaseRepository<T> repository,
+            Func<string, Task<OperationResult<List<T>>>> parser) 
+            where T : class
         {
             var result = await _uploadManager.UploadFormFileAsync(
-                _appSettings.StudentsFileName,
-                _studentRepository,
-                _csvParserManager.ParseStudentsCsvToStudents);
+                fileName,
+                repository,
+                parser);
 
             return result;
         }
 
-        private async Task<OperationResult> AddSpecializations()
-        {
-            var result = await _uploadManager.UploadFormFileAsync(
-                _appSettings.SpecializationsFileName,
-                _specializationRepository,
-                _csvParserManager.ParseSpecializationCsvToSpecializations);
-
-            return result;
-        }
-
-        private async Task<OperationResult> AddCourses()
-        {
-            var result = await _uploadManager.UploadFormFileAsync(
-                _appSettings.CoursesFileName,
-                _courseRepository,
-                _csvParserManager.ParseCourseCsvToSpecializations);
-
-            return result;
-        }
-
-        private async Task<OperationResult> AddAssignments()
-        {
-            var result = await _uploadManager.UploadFormFileAsync(
-                _appSettings.AssignmentFileName,
-                _assignmentRepository,
-                _csvParserManager.ParseAssignmentCsvToAssignments);
-
-            return result;
-        }
-
-        private async Task TruncateAllTables()
+        private async Task ClearAllTables()
         {
             await _studentRepository.Clear();
             await _specializationRepository.Clear();

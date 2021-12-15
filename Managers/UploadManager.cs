@@ -38,7 +38,8 @@ namespace Server.Managers
 
             var encoding = _appSettings.FileEncoding;
             var fileText = await File.ReadAllTextAsync($"{_appSettings.Path}\\{fileName}", Encoding.GetEncoding(encoding));
-            var parsingResult = await parser(fileText);
+            var parsingResult = await TryGetParsingResult(fileText, parser);
+            
             if (!parsingResult.IsSuccess)
             {
                 Serilog.Log.Error($"{tag}: An error occured while parsing csv");
@@ -53,6 +54,21 @@ namespace Server.Managers
             }
 
             return OperationResult<T>.Success();
+        }
+
+        private async Task<OperationResult<List<T>>> TryGetParsingResult<T>(
+            string fileText,
+            Func<string, Task<OperationResult<List<T>>>> parser)
+        {
+            try
+            {
+                var parsingResult = await parser(fileText);
+                return parsingResult;
+            }
+            catch (Exception e)
+            {
+                return OperationResult<List<T>>.Error("Произошла ошибка при получении данных из файла");
+            }
         }
     }
 }
