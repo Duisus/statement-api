@@ -1,3 +1,4 @@
+using System.Data;
 using FluentMigrator;
 
 namespace Migrations 
@@ -58,8 +59,8 @@ namespace Migrations
             {
                 Create.Table("Course")
                     .WithColumn("Id").AsInt64().PrimaryKey().Identity()
-                    .WithColumn("SpecializationId").AsInt64().ForeignKey("Specialization", "Id").Nullable()
-                    .WithColumn("StudentId").AsInt64().ForeignKey("Student", "Id")
+                    .WithColumn("SpecializationId").AsInt64().ForeignKey("Specialization", "Id").OnDelete(Rule.Cascade).Nullable()
+                    .WithColumn("StudentId").AsInt64().ForeignKey("Student", "Id").OnDelete(Rule.Cascade)
                     .WithColumn("Title").AsString()
                     .WithColumn("IsCompleted").AsBoolean()
                     .WithColumn("Progress").AsDouble()
@@ -81,7 +82,7 @@ namespace Migrations
             {
                 Create.Table("Assignment")
                     .WithColumn("Id").AsInt64().PrimaryKey().Identity()
-                    .WithColumn("StudentId").AsInt64().ForeignKey("Student", "Id")
+                    .WithColumn("StudentId").AsInt64().ForeignKey("Student", "Id").OnDelete(Rule.Cascade)
                     .WithColumn("Title").AsString()
                     .WithColumn("Order").AsInt64()
                     .WithColumn("AttemptGrade").AsFloat().Nullable()
