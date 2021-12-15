@@ -6,7 +6,7 @@ namespace Server.Managers.Interfaces
 {
     public interface IUnloadManager
     {
-        public Task<OperationResult> UnloadBySpecializationAsync(string specializaiton);
+        public Task<OperationResult> UnloadBySpecializationAsync(List<string> specializaiton);
 
         public Task<OperationResult> UnloadByCoursesAsync(List<string> courses);
     }

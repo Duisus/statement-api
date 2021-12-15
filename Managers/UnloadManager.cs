@@ -27,85 +27,91 @@ namespace Server.Managers
             _appSettings = appSettings;
         }
         
-        public async Task<OperationResult> UnloadBySpecializationAsync(string specializationTitle)
+        public async Task<OperationResult> UnloadBySpecializationAsync(List<string> specializationTitles)
         {
-            var getSpecializationsResult = await _specializationRepository.GetByTitleAsync(specializationTitle);
-            if (!getSpecializationsResult.IsSuccess)
-            {
-                return OperationResult.Error(getSpecializationsResult.ErrorText);
-            }
-
-            var specializations = getSpecializationsResult.Data;
-            var possibleCoursesCount = new Dictionary<string, int>();
-            List<string> possibleCourses;
-            foreach (var specialization in specializations)
-            {
-                var getCourses = await _courseRepository.GetBySpecializationIdAsync(specialization.Id);
-                if (getCourses.IsSuccess)
-                {
-                    foreach (var course in getCourses.Data)
-                    {
-                        if (!possibleCoursesCount.ContainsKey(course.Title))
-                        {
-                            possibleCoursesCount.Add(course.Title, 0);
-                        }
-                        possibleCoursesCount[course.Title]++;
-                    }
-                }
-            }
-
-            if (specializations.Count > 5)
-                possibleCourses = possibleCoursesCount.Where(keyValue => keyValue.Value > 5)
-                    .Select(keyValue => keyValue.Key).ToList();
-            else
-            {
-                possibleCourses = possibleCoursesCount.Select(keyValue => keyValue.Key).ToList();
-            }
-
+            var sheetsIndex = 0;
             var workbook = new Workbook();
-            var sheet = workbook.Worksheets[0];
-            
-            //appending header
-            var cell = sheet.Cells[0,0];
-            cell.PutValue("ФИО студента");
-            for (var i = 0; i < possibleCourses.Count; i++)
+            var sheet = workbook.Worksheets[sheetsIndex];
+            foreach (var specializationTitle in specializationTitles)
             {
-                cell = sheet.Cells[0,i + 1];
-                cell.PutValue(possibleCourses.ElementAt(i));
-            }
-
-            var row = 1;
-            var column = 0;
-            foreach (var specialization in specializations)
-            {
-                var student = await _studentRepository.GetAsync(specialization.StudentId);
-                var courses = await _courseRepository.GetBySpecializationIdAsync(specialization.Id);
-                if (!courses.IsSuccess)
-                    continue;
-                cell = sheet.Cells[row, column];
-                cell.PutValue(student.Data.FullName);
-                column++;
-                for (int i = 0; i < possibleCourses.Count; i++)
+                var getSpecializationsResult = await _specializationRepository.GetByTitleAsync(specializationTitle);
+                if (!getSpecializationsResult.IsSuccess)
                 {
-                    var course = courses.Data.FirstOrDefault(crs => crs.Title == possibleCourses.ElementAt(i));
-                    cell = sheet.Cells[row, column];
-                    if (course is not null)
-                    {
-                        cell.PutValue(Math.Round(course.Grade, 2));
-                    }
-                    else
-                    {
-                        cell.PutValue(0);
-                    }
-
-                    column++;
+                    return OperationResult.Error(getSpecializationsResult.ErrorText);
                 }
 
-                column = 0;
-                row++;
+                var specializations = getSpecializationsResult.Data;
+                var possibleCoursesCount = new Dictionary<string, int>();
+                List<string> possibleCourses;
+                foreach (var specialization in specializations)
+                {
+                    var getCourses = await _courseRepository.GetBySpecializationIdAsync(specialization.Id);
+                    if (getCourses.IsSuccess)
+                    {
+                        foreach (var course in getCourses.Data)
+                        {
+                            if (!possibleCoursesCount.ContainsKey(course.Title))
+                            {
+                                possibleCoursesCount.Add(course.Title, 0);
+                            }
+
+                            possibleCoursesCount[course.Title]++;
+                        }
+                    }
+                }
+
+                if (specializations.Count > 5)
+                    possibleCourses = possibleCoursesCount.Where(keyValue => keyValue.Value > 5)
+                        .Select(keyValue => keyValue.Key).ToList();
+                else
+                {
+                    possibleCourses = possibleCoursesCount.Select(keyValue => keyValue.Key).ToList();
+                }
+
+                //appending header
+                var cell = sheet.Cells[0, 0];
+                cell.PutValue("ФИО студента");
+                for (var i = 0; i < possibleCourses.Count; i++)
+                {
+                    cell = sheet.Cells[0, i + 1];
+                    cell.PutValue(possibleCourses.ElementAt(i));
+                }
+
+                var row = 1;
+                var column = 0;
+                foreach (var specialization in specializations)
+                {
+                    var student = await _studentRepository.GetAsync(specialization.StudentId);
+                    var courses = await _courseRepository.GetBySpecializationIdAsync(specialization.Id);
+                    if (!courses.IsSuccess)
+                        continue;
+                    cell = sheet.Cells[row, column];
+                    cell.PutValue(student.Data.FullName);
+                    column++;
+                    for (int i = 0; i < possibleCourses.Count; i++)
+                    {
+                        var course = courses.Data.FirstOrDefault(crs => crs.Title == possibleCourses.ElementAt(i));
+                        cell = sheet.Cells[row, column];
+                        if (course is not null)
+                        {
+                            cell.PutValue(Math.Round(course.Grade, 2));
+                        }
+                        else
+                        {
+                            cell.PutValue(0);
+                        }
+
+                        column++;
+                    }
+
+                    column = 0;
+                    row++;
+                }
+                sheet.AutoFitColumns();
+                workbook.Save(Path.Combine(_appSettings.Path, _appSettings.UnloadSpecializationFileName) + ".xlsx");
+                sheetsIndex++;
+                sheet = workbook.Worksheets[sheetsIndex];
             }
-            sheet.AutoFitColumns();
-            workbook.Save(Path.Combine(_appSettings.Path, _appSettings.UnloadSpecializationFileName) + ".xlsx");
             return OperationResult.Success();
         }
 
