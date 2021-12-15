@@ -27,11 +27,11 @@
         }
     }
     
-    public class OperationResult<T> : OperationResult where T : class
+    public class OperationResult<T> : OperationResult
     {
         public T Data { get; set; }
 
-        public static OperationResult<T> Success(T data = null, int statusCode = 200)
+        public static OperationResult<T> Success(T data = default, int statusCode = 200)
         {
             return new OperationResult<T>
             {
