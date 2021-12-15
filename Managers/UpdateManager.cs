@@ -103,10 +103,10 @@ namespace Server.Managers
 
         private async Task ClearAllTables()
         {
-            await _studentRepository.Clear();
-            await _specializationRepository.Clear();
             await _courseRepository.Clear();
             await _assignmentRepository.Clear();
+            await _studentRepository.Clear();
+            await _specializationRepository.Clear();
         }
     }
 }
