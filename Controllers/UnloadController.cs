@@ -31,7 +31,7 @@ namespace Server.Controllers
         /// <returns></returns>
         [ProducesResponseType(typeof(FileContentResult), 200)]
         [HttpPost("specialization")]
-        public async Task<ActionResult> UnloadBySpecializationAsync([FromBody] string specializationName)
+        public async Task<ActionResult> UnloadBySpecializationAsync([FromBody] List<string> specializationName)
         {
             var result = await _unloadManager.UnloadBySpecializationAsync(specializationName);
             if (result.IsSuccess)
