@@ -35,7 +35,7 @@ namespace Server.Managers
             var rows = await ParseCsvFileAsync(",", file);
             foreach (var row in rows.Where(x => x.Length > 1))
             {
-                var name = row[0];
+                var name = row[0].Trim();
                 if (existingStudents.Any(student => student.FullName == name)) continue;
                 var group = row[2];
                 var enrolledCourses = int.Parse(row[5]);
@@ -54,9 +54,12 @@ namespace Server.Managers
                 if (!students.ContainsKey(name))
                     students.Add(name, student);
                 else
-                    students[row[0]] = student;
+                {
+                    students[name].EnrolledCourses += student.EnrolledCourses;
+                    students[name].CompletedCourses += student.CompletedCourses;
+                }
             }
-
+            
             var result = students.Values.GroupBy(stud => stud.FullName).Select(stud => stud.First()).ToList();
             return OperationResult<List<Student>>.Success(result);
         }
@@ -69,7 +72,7 @@ namespace Server.Managers
             var existingSpecializations = await _specializationRepository.GetAllAsync();
             foreach (var row in rows.Where(row => row.Length > 1))
             {
-                var name = row[0];
+                var name = row[0].Trim();
                 if (name == "ANONYMIZED_NAME" || string.IsNullOrEmpty(name)) continue;
                 if (result.ContainsKey(name))
                 {
@@ -114,7 +117,7 @@ namespace Server.Managers
             var rows = await ParseCsvFileAsync(",", file);
             foreach (var row in rows.Where(row => row.Length > 1))
             {
-                var name = row[0];
+                var name = row[0].Trim();
                 var course = CreateCourseWithoutStudentIdSpecId(row);
                 if (existingCourses.Any(existingCourse => existingCourse.Equals(course))) continue;
                 if (result.ContainsKey(name))
@@ -162,12 +165,11 @@ namespace Server.Managers
         {
             var rows = await ParseCsvFileAsync(",", file);
             var students = await _studentRepository.GetAllAsync();
-            var courses = await _courseRepository.GetAllAsync();
             var assignments = await _assignmentRepository.GetAllAsync();
             var result = new Dictionary<string, List<Assignment>>();
             foreach (var row in rows.Where(row => row.Length > 1))
             {
-                var studentName = row[3];
+                var studentName = row[3].Trim();
                 var student = students.FirstOrDefault(student => student.FullName == studentName);
                 if (student is null)
                 {
