@@ -1,10 +1,12 @@
-﻿using Aspose.Cells;
+﻿using System.Threading.Tasks;
+using Aspose.Cells;
+using Server.Logic;
 
 namespace Server.Services
 {
     public class SpecializationWorksheetAppender: IWorksheetAppender<string>
     {
-        public void Append(Workbook workbook, string specializationTitle)
+        public async Task<OperationResult> Append(Workbook workbook, string specializationTitle)
         {
             throw new System.NotImplementedException();
         }

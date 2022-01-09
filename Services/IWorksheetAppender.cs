@@ -1,9 +1,11 @@
-﻿using Aspose.Cells;
+﻿using System.Threading.Tasks;
+using Aspose.Cells;
+using Server.Logic;
 
 namespace Server.Services
 {
     public interface IWorksheetAppender<T>
     {
-        public void Append(Workbook workbook, T workSheetData);
+        public Task<OperationResult> Append(Workbook workbook, T workSheetData);
     }
 }
