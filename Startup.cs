@@ -18,6 +18,7 @@ using Server.Profiles;
 using server.Repository;
 using Server.Repository;
 using Server.Repository.Interfaces;
+using Server.Services;
 using Server.Settings;
 
 namespace Server
@@ -74,6 +75,11 @@ namespace Server
             //Настройки
             services
                 .AddTransient<IAppSettings, AppSettings>();
+            
+            //WorksheetAppenders
+            services
+                .AddTransient<CoursesWorksheetAppender>()
+                .AddTransient<SpecializationWorksheetAppender>();
 
             var mapperConfig = new MapperConfiguration(mc =>
             {
