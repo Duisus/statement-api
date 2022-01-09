@@ -24,7 +24,7 @@ namespace Server.Controllers
             _appSettings = appSettings;
         }   
 
-        /// <summary>
+        /*/// <summary>
         /// Выгрузить из таблицы Specialization, Course в виде файла формата xlsx всех студентов и их оценки за курсы на данной специализации
         /// </summary>
         /// <param name="specializationName">Название специализации</param>
@@ -62,6 +62,24 @@ namespace Server.Controllers
             {
                 var filePath = Path.Combine(_appSettings.Path, _appSettings.UnloadCoursesFileName) + ".xlsx";
                 var fileName = _appSettings.UnloadCoursesFileName + ".xlsx";
+                var fileBytes = await System.IO.File.ReadAllBytesAsync(filePath);
+                
+                System.IO.File.Delete(filePath);
+                
+                return File(fileBytes, "application/force-download", fileName);
+            }
+
+            return BadRequest();
+        }*/
+        [ProducesResponseType(typeof(FileContentResult), 200)]
+        /*[HttpPost("courses")]*/
+        public async Task<ActionResult> UnloadAsync([FromBody] List<string> courses, [FromBody] List<string> specializationName)
+        {
+            var result = await _unloadManager.UnloadAsync(courses, specializationName);
+            if (result.IsSuccess)
+            {
+                var filePath = Path.Combine(_appSettings.Path, _appSettings.UnloadFileName) + ".xlsx";
+                var fileName = _appSettings.UnloadFileName + ".xlsx";
                 var fileBytes = await System.IO.File.ReadAllBytesAsync(filePath);
                 
                 System.IO.File.Delete(filePath);

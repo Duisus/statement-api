@@ -8,6 +8,7 @@ using Server.Managers.Interfaces;
 using Server.Repository.Interfaces;
 using Server.Settings;
 using Aspose.Cells;
+using Server.Services;
 
 namespace Server.Managers
 {
@@ -27,7 +28,7 @@ namespace Server.Managers
             _appSettings = appSettings;
         }
         
-        public async Task<OperationResult> UnloadBySpecializationAsync(string specializationTitle)
+        /*public async Task<OperationResult> UnloadBySpecializationAsync(string specializationTitle)
         {
             var getSpecializationsResult = await _specializationRepository.GetByTitleAsync(specializationTitle);
             if (!getSpecializationsResult.IsSuccess)
@@ -139,6 +140,17 @@ namespace Server.Managers
                 row += 2;
             }
             sheet.AutoFitColumns();
+            workbook.Save(Path.Combine(_appSettings.Path, _appSettings.UnloadCoursesFileName) + ".xlsx");
+            return OperationResult.Success();
+        }*/
+        public async Task<OperationResult> UnloadAsync(List<string> courses, List<string> specializationTitles)
+        {
+            var workbook = new Workbook();
+            CoursesWorksheetAppender.Append(workbook, courses);
+            foreach (var specializationTitle in specializationTitles)
+            {
+                SpecializationWorksheetAppender.Append(workbook, specializationTitle);
+            }
             workbook.Save(Path.Combine(_appSettings.Path, _appSettings.UnloadCoursesFileName) + ".xlsx");
             return OperationResult.Success();
         }

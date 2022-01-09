@@ -43,6 +43,10 @@ namespace Server.Settings
         public string UnloadCoursesFileName => _configuration
             .GetSection(FileSection)
             .GetValue<string>("UnloadCoursesFileName");
+        
+        public string UnloadFileName => _configuration
+            .GetSection(FileSection)
+            .GetValue<string>("UnloadFileName");
 
         public string FileEncoding => _configuration
             .GetSection(FileSection)
