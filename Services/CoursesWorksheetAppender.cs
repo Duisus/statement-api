@@ -9,13 +9,14 @@ using Server.Settings;
 
 namespace Server.Services
 {
-    public class CoursesWorksheetAppender:IWorksheetAppender<List<string>>
+    public class CoursesWorksheetAppender : IWorksheetAppender<List<string>>
     {
-        private ICourseRepository _courseRepository;
-        private IStudentRepository _studentRepository;
-        private IAppSettings _appSettings;
+        private readonly IAppSettings _appSettings;
+        private readonly ICourseRepository _courseRepository;
+        private readonly IStudentRepository _studentRepository;
 
-        public CoursesWorksheetAppender(ICourseRepository courseRepository, IStudentRepository studentRepository, IAppSettings appSettings)
+        public CoursesWorksheetAppender(ICourseRepository courseRepository, IStudentRepository studentRepository,
+            IAppSettings appSettings)
         {
             _courseRepository = courseRepository;
             _studentRepository = studentRepository;
@@ -31,25 +32,24 @@ namespace Server.Services
             {
                 var getCourses = await _courseRepository.GetByTitleAsync(courseTitle);
                 if (!getCourses.IsSuccess)
-                {
                     return OperationResult.Error("Ошибка при получении курса с названием " + courseTitle);
-                }
 
                 var courses = getCourses.Data;
                 sheet.Cells[row, column].PutValue("ФИО студента");
                 sheet.Cells[row, column + 1].PutValue(courseTitle);
-                
+
                 foreach (var course in courses)
                 {
                     var student = await _studentRepository.GetAsync(course.StudentId);
                     row += 1;
                     column = 0;
-                    sheet.Cells[row,column].PutValue(student.Data.FullName);
+                    sheet.Cells[row, column].PutValue(student.Data.FullName);
                     sheet.Cells[row, column + 1].PutValue(Math.Round(course.Grade, 2));
                 }
 
                 row += 2;
             }
+
             sheet.AutoFitColumns();
             workbook.Save(Path.Combine(_appSettings.Path, _appSettings.UnloadCoursesFileName) + ".xlsx");
             return OperationResult.Success();
