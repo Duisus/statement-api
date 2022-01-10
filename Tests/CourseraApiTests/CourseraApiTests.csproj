@@ -18,4 +18,23 @@
       <ProjectReference Include="..\..\Server.csproj" />
     </ItemGroup>
 
+    <ItemGroup>
+      <Folder Include="TestData" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <None Update="TestData\membership-report.csv">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </None>
+      <None Update="TestData\specialization-report.csv">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </None>
+      <None Update="TestData\Ural Federal University Learning Program.csv">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </None>
+      <None Update="TestData\usage-report.csv">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </None>
+    </ItemGroup>
+
 </Project>
