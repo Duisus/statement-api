@@ -26,7 +26,7 @@ namespace Server.Controllers
         }
         
         [ProducesResponseType(typeof(GetCoursesAndSpecializationsToUnloadResponseDto), 200)]
-        [HttpPost("unload")]
+        [HttpPost()]
         public async Task<ActionResult> UnloadAsync([FromBody] GetCoursesAndSpecializationsToUnloadResponseDto unloadResponseDto)
         {
             var courses = unloadResponseDto.Courses;

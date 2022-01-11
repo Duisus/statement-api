@@ -25,7 +25,7 @@ namespace Server.Services
 
         public async Task<OperationResult> Append(Workbook workbook, List<string> coursesTitles)
         {
-            var sheet = workbook.Worksheets[0];
+            var sheet = workbook.Worksheets.Add("Курсы");
             var row = 0;
             var column = 0;
             foreach (var courseTitle in coursesTitles)
@@ -51,7 +51,6 @@ namespace Server.Services
             }
 
             sheet.AutoFitColumns();
-            workbook.Save(Path.Combine(_appSettings.Path, _appSettings.UnloadCoursesFileName) + ".xlsx");
             return OperationResult.Success();
         }
     }

@@ -42,9 +42,17 @@ namespace Server.Services
                     .Select(keyValue => keyValue.Key).ToList();
             else
                 possibleCourses = possibleCoursesCount.Select(keyValue => keyValue.Key).ToList();
-
-            var sheet = workbook.Worksheets[0];
-            sheet.Name = specializationTitle;
+            
+            var sheetName = specializationTitle
+                .Replace(":", "")
+                .Replace("/","")
+                .Replace("\\","")
+                .Replace("?", "")
+                .Replace("*", "")
+                .Replace("[", "")
+                .Replace("]", ""); 
+            sheetName = sheetName.Length < 31 ? sheetName : sheetName.Substring(0, 31);
+            var sheet = workbook.Worksheets.Add(sheetName);
 
             //appending header
             var cell = sheet.Cells[0, 0];
@@ -83,7 +91,6 @@ namespace Server.Services
             }
 
             sheet.AutoFitColumns();
-            workbook.Save(Path.Combine(_appSettings.Path, _appSettings.UnloadSpecializationFileName) + ".xlsx");
             return OperationResult.Success();
         }
 

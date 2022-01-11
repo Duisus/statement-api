@@ -35,10 +35,13 @@ namespace Server.Managers
             var specializationWorksheetAppender = new SpecializationWorksheetAppender(_courseRepository,
                 _studentRepository, _specializationRepository, _appSettings);
             var workbook = new Workbook();
-            await coursesWorksheetAppender.Append(workbook, courses);
+            if(courses.Count > 0)
+                await coursesWorksheetAppender.Append(workbook, courses);
             foreach (var specializationTitle in specializationTitles)
                 await specializationWorksheetAppender.Append(workbook, specializationTitle);
-            workbook.Save(Path.Combine(_appSettings.Path, _appSettings.UnloadCoursesFileName) + ".xlsx");
+            
+            workbook.Worksheets.RemoveAt(0);
+            workbook.Save(Path.Combine(_appSettings.Path, _appSettings.UnloadFileName) + ".xlsx");
             return OperationResult.Success();
         }
     }
