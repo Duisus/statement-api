@@ -4,6 +4,8 @@
         <TargetFramework>net5.0</TargetFramework>
 
         <IsPackable>false</IsPackable>
+
+        <RootNamespace>CourseraApiTests</RootNamespace>
     </PropertyGroup>
 
     <ItemGroup>
