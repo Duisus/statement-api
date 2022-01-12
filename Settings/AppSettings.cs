@@ -36,14 +36,6 @@ namespace Server.Settings
             .GetSection(FileSection)
             .GetValue<string>("Path");
         
-        public string UnloadSpecializationFileName => _configuration
-            .GetSection(FileSection)
-            .GetValue<string>("UnloadSpecializationFileName");
-        
-        public string UnloadCoursesFileName => _configuration
-            .GetSection(FileSection)
-            .GetValue<string>("UnloadCoursesFileName");
-        
         public string UnloadFileName => _configuration
             .GetSection(FileSection)
             .GetValue<string>("UnloadFileName");

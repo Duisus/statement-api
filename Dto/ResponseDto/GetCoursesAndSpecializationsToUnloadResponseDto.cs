@@ -7,11 +7,9 @@ namespace Server.Dto.ResponseDto
     public class GetCoursesAndSpecializationsToUnloadResponseDto
     {
         [JsonProperty("courses")]
-        /*[FromBody]*/
         public List<string> Courses { get; set; }
         
         [JsonProperty("specializations")]
-        /*[FromBody]*/
         public List<string> Specializations { get; set; }
     }
 }
