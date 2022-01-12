@@ -16,7 +16,7 @@ namespace Server.Managers
         private readonly IFileRepository _fileRepository;
         private readonly IAppSettings _appSettings;
 
-        public UploadManager(IFileRepository fileRepository, ICsvParserManager csvParserManager, IAppSettings appSettings)
+        public UploadManager(IFileRepository fileRepository, IAppSettings appSettings)
         {
             _fileRepository = fileRepository;
             _appSettings = appSettings;

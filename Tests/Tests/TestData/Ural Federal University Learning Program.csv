@@ -1,0 +1,2 @@
+"Program","Collections","External User Id","User Name","User Email","Course Name","Module","Lesson","Item","Item Order","Attempt Grade","Grade After Override","Is Attempt Passed","Attempt Timestamp (UTC)","Item Attempt Number","Is Course Passed"
+"TestProgram","","TestId","TestName","test@urfu.me","TestCourse","TestModule","TestLesson","TestItem","1","0.8","","Yes","2021-10-17T05:59:15.222Z","1","No"
