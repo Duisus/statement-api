@@ -21,10 +21,6 @@
     </ItemGroup>
 
     <ItemGroup>
-      <Folder Include="TestData" />
-    </ItemGroup>
-
-    <ItemGroup>
       <None Update="TestData\membership-report.csv">
         <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       </None>
